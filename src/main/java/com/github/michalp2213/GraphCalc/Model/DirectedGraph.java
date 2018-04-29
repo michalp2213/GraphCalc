@@ -1,14 +1,16 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /*
  * Class describing directed graph.
  */
 
 public class DirectedGraph<T> implements Graph<T> {
-    public HashMap<Vertex<T>, HashSet<Edge<T>>> list;
+    protected HashMap<Vertex<T>, HashSet<Edge<T>>> list;
 
     /*
      * Basic constructor.
@@ -24,6 +26,14 @@ public class DirectedGraph<T> implements Graph<T> {
 
     public DirectedGraph(DirectedGraph<T> g) {
         list = new HashMap<>(g.list);
+    }
+
+    /*
+     * Get read-only adjacency list that represents graph.
+     */
+
+    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdajacencyList() {
+        return Collections.unmodifiableMap(list);
     }
 
     @Override

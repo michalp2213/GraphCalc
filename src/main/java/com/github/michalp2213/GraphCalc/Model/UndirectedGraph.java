@@ -1,14 +1,16 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
 /*
  * Class describing undirected graph.
  */
 
 public class UndirectedGraph<T> implements Graph<T> {
-    public HashMap<Vertex<T>, HashSet<Edge<T>>> list;
+    protected HashMap<Vertex<T>, HashSet<Edge<T>>> list;
 
     /*
      * Basic constructor.
@@ -29,6 +31,13 @@ public class UndirectedGraph<T> implements Graph<T> {
     @Override
     public void addVertex(Vertex<T> v) {
         list.putIfAbsent(v, new HashSet<>());
+    }
+
+    /*
+     * Get read-only adjacency list that represents graph.
+     */
+    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList() {
+        return Collections.unmodifiableMap(list);
     }
 
     @Override
