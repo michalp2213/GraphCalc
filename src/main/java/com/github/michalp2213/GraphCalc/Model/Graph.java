@@ -1,4 +1,4 @@
-package Model;
+package com.github.michalp2213.GraphCalc.Model;
 
 /*
  * Graph interface describing basic operations on graph.

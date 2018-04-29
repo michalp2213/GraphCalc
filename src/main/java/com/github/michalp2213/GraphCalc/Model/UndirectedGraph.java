@@ -1,28 +1,28 @@
-package Model;
+package com.github.michalp2213.GraphCalc.Model;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
 /*
- * Class describing directed graph.
+ * Class describing undirected graph.
  */
 
-public class DirectedGraph<T> implements Graph<T> {
+public class UndirectedGraph<T> implements Graph<T> {
     public HashMap<Vertex<T>, HashSet<Edge<T>>> list;
 
     /*
      * Basic constructor.
      */
 
-    public DirectedGraph() {
+    public UndirectedGraph() {
         list = new HashMap<>();
     }
 
     /*
-     * Copying constructor.
+     * Copying constructor
      */
 
-    public DirectedGraph(DirectedGraph<T> g) {
+    public UndirectedGraph(UndirectedGraph<T> g) {
         list = new HashMap<>(g.list);
     }
 
@@ -36,13 +36,15 @@ public class DirectedGraph<T> implements Graph<T> {
         list.putIfAbsent(e.from, new HashSet<>());
         list.putIfAbsent(e.to, new HashSet<>());
         list.get(e.from).add(e);
+        list.get(e.to).add(e.transpose());
     }
 
     @Override
     public void removeVertex(Vertex<T> v) {
-        list.remove(v);
-        for (HashSet<Edge<T>> set : list.values()) {
-            set.removeIf(e -> e.to.equals(v));
+        HashSet<Edge<T>> set = list.remove(v);
+        if (v == null) return;
+        for (Edge<T> e : set) {
+            list.get(e.to).remove(e.transpose());
         }
     }
 
@@ -51,6 +53,7 @@ public class DirectedGraph<T> implements Graph<T> {
         HashSet<Edge<T>> set = list.get(e.from);
         if (set == null) return;
         set.remove(e);
+        list.get(e.to).remove(e.transpose());
     }
 
     @Override
@@ -66,7 +69,7 @@ public class DirectedGraph<T> implements Graph<T> {
 
     @Override
     public boolean equals(Object obj) {
-        return (obj instanceof DirectedGraph) && ((DirectedGraph) obj).list.equals(list);
+        return (obj instanceof UndirectedGraph) && ((UndirectedGraph) obj).list.equals(list);
     }
 
     @Override
