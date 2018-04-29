@@ -5,17 +5,25 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /*
-    Class describing directed graph.
+ * Class describing directed graph.
  */
 
 public class DirectedGraph<T> implements Graph<T> {
     private HashMap<Vertex<T>, ArrayList<Edge<T>>> list;
 
-    public DirectedGraph(){ //Basic constructor.
+    /*
+     * Basic constructor.
+     */
+
+    public DirectedGraph() {
         list = new HashMap<>();
     }
 
-    public DirectedGraph(DirectedGraph<T> g){ //Copying constructor.
+    /*
+     * Copying constructor.
+     */
+
+    public DirectedGraph(DirectedGraph<T> g) {
         list = new HashMap<>(g.list);
     }
 
@@ -26,27 +34,28 @@ public class DirectedGraph<T> implements Graph<T> {
 
     @Override
     public void addEdge(Edge<T> e) {
-        list.putIfAbsent(e.getFrom(), new ArrayList<>());
-        list.putIfAbsent(e.getTo(), new ArrayList<>());
-        list.get(e.getFrom()).add(e);
+        list.putIfAbsent(e.from, new ArrayList<>());
+        list.putIfAbsent(e.to, new ArrayList<>());
+        list.get(e.from).add(e);
     }
 
     @Override
     public void removeVertex(Vertex<T> v) {
         list.remove(v);
-        for (ArrayList<Edge<T>> arr : list.values()){
+        for (ArrayList<Edge<T>> arr : list.values()) {
             Iterator<Edge<T>> it = arr.iterator();
-            while(it.hasNext()){
+            while (it.hasNext()) {
                 Edge<T> e = it.next();
-                if(e.getTo().equals(v)) it.remove();;
+                if (e.to.equals(v)) it.remove();
+                ;
             }
         }
     }
 
     @Override
     public void removeEdge(Edge<T> e) {
-        ArrayList<Edge<T>> arr = list.get(e.getFrom());
-        if(arr == null) return;
+        ArrayList<Edge<T>> arr = list.get(e.from);
+        if (arr == null) return;
         arr.remove(e);
     }
 
@@ -57,14 +66,13 @@ public class DirectedGraph<T> implements Graph<T> {
 
     @Override
     public boolean containsEdge(Edge<T> e) {
-        ArrayList<Edge<T>> arr = list.get(e.getFrom());
-        return arr!=null&&arr.contains(e);
+        ArrayList<Edge<T>> arr = list.get(e.from);
+        return arr != null && arr.contains(e);
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof DirectedGraph)) return false;
-        return ((DirectedGraph) obj).list.equals(list);
+        return (obj instanceof DirectedGraph) && ((DirectedGraph) obj).list.equals(list);
     }
 
     @Override

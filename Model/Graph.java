@@ -1,7 +1,7 @@
 package Model;
 
 /*
-    Basic graph interface.
+ * Basic graph interface.
  */
 
 public interface Graph<T> {

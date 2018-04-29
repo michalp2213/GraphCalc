@@ -3,19 +3,27 @@ package Model;
 import java.util.Objects;
 
 /*
-    Class describing edge.
+ * Class describing edge.
  */
 
 public class Edge<T> {
-    private final Vertex<T> from;
-    private final Vertex<T> to;
-    private final int weight;
+    public final Vertex<T> from;
+    public final Vertex<T> to;
+    public final int weight;
 
-    public Edge(Vertex<T> from, Vertex<T> to) { //Basic constructor.
+    /*
+     * Basic constructor.
+     */
+
+    public Edge(Vertex<T> from, Vertex<T> to) {
         this(from, to, 1);
     }
 
-    public Edge(Vertex<T> from, Vertex<T> to, int weight) { //Constructor for weighted edge.
+    /*
+     * Constructor for weighted edge.
+     */
+
+    public Edge(Vertex<T> from, Vertex<T> to, int weight) {
         this.from = from;
         this.to = to;
         this.weight = weight;
@@ -25,17 +33,6 @@ public class Edge<T> {
         return new Edge<>(to, from, weight);
     }
 
-    public Vertex<T> getFrom() {
-        return from;
-    }
-
-    public Vertex<T> getTo() {
-        return to;
-    }
-
-    public int getWeight() {
-        return weight;
-    }
 
     @Override
     public boolean equals(Object obj) {

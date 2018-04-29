@@ -1,8 +1,8 @@
 package Model;
 
 /*
-    Class describing vertex.
-*/
+ * Class describing vertex.
+ */
 
 public class Vertex<T> {
     private final T v;
