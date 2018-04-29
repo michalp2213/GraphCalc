@@ -1,15 +1,14 @@
 package Model;
 
-
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 /*
  * Class describing undirected graph.
  */
 
 public class UndirectedGraph<T> implements Graph<T> {
-    private HashMap<Vertex<T>, ArrayList<Edge<T>>> list;
+    public HashMap<Vertex<T>, HashSet<Edge<T>>> list;
 
     /*
      * Basic constructor.
@@ -29,31 +28,31 @@ public class UndirectedGraph<T> implements Graph<T> {
 
     @Override
     public void addVertex(Vertex<T> v) {
-        list.putIfAbsent(v, new ArrayList<>());
+        list.putIfAbsent(v, new HashSet<>());
     }
 
     @Override
     public void addEdge(Edge<T> e) {
-        list.putIfAbsent(e.from, new ArrayList<>());
-        list.putIfAbsent(e.to, new ArrayList<>());
+        list.putIfAbsent(e.from, new HashSet<>());
+        list.putIfAbsent(e.to, new HashSet<>());
         list.get(e.from).add(e);
         list.get(e.to).add(e.transpose());
     }
 
     @Override
     public void removeVertex(Vertex<T> v) {
-        ArrayList<Edge<T>> arr = list.remove(v);
+        HashSet<Edge<T>> set = list.remove(v);
         if (v == null) return;
-        for (Edge<T> e : arr) {
+        for (Edge<T> e : set) {
             list.get(e.to).remove(e.transpose());
         }
     }
 
     @Override
     public void removeEdge(Edge<T> e) {
-        ArrayList<Edge<T>> arr = list.get(e.from);
-        if (arr == null) return;
-        arr.remove(e);
+        HashSet<Edge<T>> set = list.get(e.from);
+        if (set == null) return;
+        set.remove(e);
         list.get(e.to).remove(e.transpose());
     }
 
@@ -64,8 +63,8 @@ public class UndirectedGraph<T> implements Graph<T> {
 
     @Override
     public boolean containsEdge(Edge<T> e) {
-        ArrayList<Edge<T>> arr = list.get(e.from);
-        return arr != null && arr.contains(e);
+        HashSet<Edge<T>> set = list.get(e.from);
+        return set != null && set.contains(e);
     }
 
     @Override

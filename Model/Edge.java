@@ -1,5 +1,6 @@
 package Model;
 
+import java.util.HashMap;
 import java.util.Objects;
 
 /*
@@ -9,40 +10,47 @@ import java.util.Objects;
 public class Edge<T> {
     public final Vertex<T> from;
     public final Vertex<T> to;
-    public final int weight;
+    public HashMap<Class, Object> attributes;
 
     /*
      * Basic constructor.
      */
 
     public Edge(Vertex<T> from, Vertex<T> to) {
-        this(from, to, 1);
+        this(from, to, new HashMap<>());
     }
 
     /*
-     * Constructor for weighted edge.
+     * Constructor for edge with attributes.
      */
 
-    public Edge(Vertex<T> from, Vertex<T> to, int weight) {
+    public Edge(Vertex<T> from, Vertex<T> to, HashMap<Class, Object> attributes) {
         this.from = from;
         this.to = to;
-        this.weight = weight;
+        this.attributes = new HashMap<>(attributes);
     }
 
     public Edge<T> transpose() {
-        return new Edge<>(to, from, weight);
+        return new Edge<>(to, from, attributes);
     }
 
+    /*
+     * Adding new attribute, or changing existing.
+     */
+
+    public void addAttribute(Object o) {
+        attributes.put(o.getClass(), o);
+    }
 
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Edge)) return false;
         Edge e = (Edge) obj;
-        return e.weight == weight && e.to.equals(to) && e.from.equals(from);
+        return e.attributes.equals(attributes) && e.to.equals(to) && e.from.equals(from);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(weight, from, to);
+        return Objects.hash(attributes, from, to);
     }
 }

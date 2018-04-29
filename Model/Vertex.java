@@ -6,13 +6,14 @@ package Model;
 
 public class Vertex<T> {
     private final T v;
-    public Vertex (T v){
+
+    public Vertex(T v) {
         this.v = v;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if(!(obj instanceof Vertex)) return false;
+        if (!(obj instanceof Vertex)) return false;
         return ((Vertex) obj).v.equals(v);
     }
 
