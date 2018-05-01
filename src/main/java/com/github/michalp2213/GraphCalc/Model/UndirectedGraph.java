@@ -1,12 +1,14 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import com.sun.istack.internal.NotNull;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
 /*
- * Class describing undirected graph.
+ * Class describing undirected graph. Null as vertex isn't accepted.
  */
 
 public class UndirectedGraph<T> implements Graph<T> {
@@ -25,23 +27,29 @@ public class UndirectedGraph<T> implements Graph<T> {
      */
 
     public UndirectedGraph(UndirectedGraph<T> g) {
+        if (g == null) throw new NullPointerException();
         list = new HashMap<>(g.list);
-    }
-
-    @Override
-    public void addVertex(Vertex<T> v) {
-        list.putIfAbsent(v, new HashSet<>());
     }
 
     /*
      * Get read-only adjacency list that represents graph.
      */
+
     public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList() {
         return Collections.unmodifiableMap(list);
     }
 
     @Override
+    @NotNull
+    public void addVertex(Vertex<T> v) {
+        if (v == null) throw new NullPointerException();
+        list.putIfAbsent(v, new HashSet<>());
+    }
+
+    @Override
+    @NotNull
     public void addEdge(Edge<T> e) {
+        if (e == null) throw new NullPointerException();
         list.putIfAbsent(e.from, new HashSet<>());
         list.putIfAbsent(e.to, new HashSet<>());
         list.get(e.from).add(e);
@@ -49,16 +57,20 @@ public class UndirectedGraph<T> implements Graph<T> {
     }
 
     @Override
+    @NotNull
     public void removeVertex(Vertex<T> v) {
+        if (v == null) throw new NullPointerException();
         HashSet<Edge<T>> set = list.remove(v);
-        if (v == null) return;
+        if (set == null) return;
         for (Edge<T> e : set) {
             list.get(e.to).remove(e.transpose());
         }
     }
 
     @Override
+    @NotNull
     public void removeEdge(Edge<T> e) {
+        if (e == null) throw new NullPointerException();
         HashSet<Edge<T>> set = list.get(e.from);
         if (set == null) return;
         set.remove(e);
