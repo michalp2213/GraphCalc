@@ -1,7 +1,5 @@
 package com.github.michalp2213.GraphCalc.Model;
 
-import com.sun.istack.internal.NotNull;
-
 import java.util.HashMap;
 
 /*
@@ -31,7 +29,6 @@ public class Poset<T> extends DirectedGraph<T> {
      */
 
     @Override
-    @NotNull
     public void addEdge(Edge<T> e) {
         if (e == null) throw new NullPointerException();
         if (e.from.equals(e.to) || containsEdge(e)) return;
@@ -46,7 +43,6 @@ public class Poset<T> extends DirectedGraph<T> {
      */
 
     @Override
-    @NotNull
     public void removeEdge(Edge<T> e) {
         super.removeEdge(e);
     }
@@ -56,7 +52,6 @@ public class Poset<T> extends DirectedGraph<T> {
      */
 
     @Override
-    @NotNull
     public boolean containsEdge(Edge<T> e) {
         if (e == null) throw new NullPointerException();
         if (!containsVertex(e.from) || !containsVertex(e.to)) return false;

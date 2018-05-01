@@ -1,7 +1,5 @@
 package com.github.michalp2213.GraphCalc.Model;
 
-import com.sun.istack.internal.NotNull;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,14 +38,12 @@ public class DirectedGraph<T> implements Graph<T> {
     }
 
     @Override
-    @NotNull
     public void addVertex(Vertex<T> v) {
         if (v == null) throw new NullPointerException();
         list.putIfAbsent(v, new HashSet<>());
     }
 
     @Override
-    @NotNull
     public void addEdge(Edge<T> e) {
         if (e == null) throw new NullPointerException();
         list.putIfAbsent(e.from, new HashSet<>());
@@ -56,7 +52,6 @@ public class DirectedGraph<T> implements Graph<T> {
     }
 
     @Override
-    @NotNull
     public void removeVertex(Vertex<T> v) {
         if (v == null) throw new NullPointerException();
         list.remove(v);
@@ -66,7 +61,6 @@ public class DirectedGraph<T> implements Graph<T> {
     }
 
     @Override
-    @NotNull
     public void removeEdge(Edge<T> e) {
         if (e == null) throw new NullPointerException();
         HashSet<Edge<T>> set = list.get(e.from);
