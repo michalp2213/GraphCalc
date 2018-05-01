@@ -36,6 +36,7 @@ public class Poset<T> extends DirectedGraph<T> {
         addVertex(e.from);
         addVertex(e.to);
         list.get(e.from).add(e);
+        transposedList.get(e.to).add(e.transpose());
     }
 
     /*
