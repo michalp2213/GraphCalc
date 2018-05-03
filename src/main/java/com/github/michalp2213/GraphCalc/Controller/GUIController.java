@@ -1,4 +1,4 @@
-package com.github.michalp2213.GraphCalc.Control;
+package com.github.michalp2213.GraphCalc.Controller;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
