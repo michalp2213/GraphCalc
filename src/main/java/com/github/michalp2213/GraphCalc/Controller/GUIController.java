@@ -31,8 +31,8 @@ public class GUIController {
     public Pane workspace;
     public GridPane mainFrame;
     public GridPane newMenu;
-    public ComboBox graphTypeBox;
-    public ComboBox sourceTypeBox;
+    public ComboBox<String> graphTypeBox;
+    public ComboBox<String> sourceTypeBox;
     public TextField pathField;
     public Button newMenuExitButton;
     public Button newMenuAcceptButton;
@@ -43,31 +43,62 @@ public class GUIController {
     private boolean removeObjects = false;
 
     @FXML
-    public void showFileMenu(){
+    public void showFileMenu() {
         fileMenu.setVisible(true);
+        fileMenu.toFront();
     }
 
     @FXML
-    public void hideFileMenu(){
+    public void hideFileMenu() {
         fileMenu.setVisible(false);
     }
 
     @FXML
-    public void showNewMenu(ActionEvent event){
+    public void showNewMenu(ActionEvent event) {
         newMenu.setVisible(true);
+        if (graphTypeBox.getItems().isEmpty()) {
+            graphTypeBox.getItems().addAll("Undirected",
+                    "Directed",
+                    "Poset");
+        }
+        if (sourceTypeBox.getItems().isEmpty()) {
+            sourceTypeBox.getItems().addAll("Clear",
+                    "Adjacency lists",
+                    "Adjacency matrix");
+        }
+        hideFileMenu();
     }
 
     @FXML
-    public void newMenuCancelAndExit(ActionEvent event){
+    public void newMenuCancelAndExit(ActionEvent event) {
         //todo
         newMenu.setVisible(false);
     }
 
     @FXML
-    public void newMenuAcceptAndExit(ActionEvent event){
+    public void newMenuAcceptAndExit(ActionEvent event) {
         //todo
         newMenu.setVisible(false);
     }
+
+    @FXML
+    public void openClicked(ActionEvent event) {
+        //todo
+        hideFileMenu();
+    }
+
+    @FXML
+    public void saveClicked(ActionEvent event) {
+        //todo
+        hideFileMenu();
+    }
+
+    @FXML
+    public void saveAsClicked(ActionEvent event) {
+        //todo
+        hideFileMenu();
+    }
+
     @FXML
     public void addVertices(MouseEvent mouseEvent) {
         addVerticesMode = !addVerticesMode;
@@ -78,22 +109,21 @@ public class GUIController {
     }
 
     public void workspaceClicked(MouseEvent mouseEvent) {
-        if(addVerticesMode){
+        if (addVerticesMode) {
             Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
             workspace.getChildren().add(c);
             graph.addVertex(new CircleVertex(c, workspace));
             EventHandler<MouseEvent> vertexClicked = e -> {
-                if(removeObjects){
+                if (removeObjects) {
                     graph.removeVertex(new CircleVertex(c, workspace));
-                }
-                else if(addEdgesMode){
-                    if(c1 == null) c1 = c;
-                    else if(c2 == null){
+                } else if (addEdgesMode) {
+                    if (c1 == null) c1 = c;
+                    else if (c2 == null) {
                         c2 = c;
                         Line l = new Line(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
                         Circle a = c1, b = c2;
                         EventHandler<MouseEvent> edgeClicked = event -> {
-                            if(removeObjects){
+                            if (removeObjects) {
                                 graph.removeEdge(new LineEdge(new CircleVertex(a, workspace), new CircleVertex(b, workspace), l, workspace));
                             }
                         };

@@ -105,21 +105,24 @@
                 maxWidth="70"
                 minWidth="70"
                 maxHeight="25"
-                minHeight="25"/>
+                minHeight="25"
+                onAction="#openClicked"/>
 
         <Button fx:id="saveButton"
                 text="Save"
                 maxWidth="70"
                 minWidth="70"
                 maxHeight="25"
-                minHeight="25"/>
+                minHeight="25"
+                onAction="#saveClicked"/>
 
         <Button fx:id="saveAsButton"
                 text="Save as..."
                 maxWidth="70"
                 minWidth="70"
                 maxHeight="25"
-                minHeight="25"/>
+                minHeight="25"
+                onAction="#saveAsClicked"/>
     </VBox>
 
     <Pane fx:id="workspace"
@@ -127,6 +130,10 @@
             GridPane.columnIndex="1"
             GridPane.columnSpan="3"
             GridPane.rowSpan="3"
+            maxWidth="Infinity"
+            minWidth="730"
+            maxHeight="Infinity"
+            minHeight="600"
             onMouseClicked="#workspaceClicked">
     </Pane>
 
