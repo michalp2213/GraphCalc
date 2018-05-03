@@ -2,13 +2,13 @@ package com.github.michalp2213.GraphCalc.Model;
 
 import java.util.HashMap;
 
-/*
+/**
  * Class describing poset(partially ordered set). Null as vertex isn't accepted.
  */
 
 public class Poset<T> extends DirectedGraph<T> {
 
-    /*
+    /**
      * Basic constructor.
      */
 
@@ -16,7 +16,7 @@ public class Poset<T> extends DirectedGraph<T> {
         super();
     }
 
-    /*
+    /**
      * Copying constructor.
      */
 
@@ -24,7 +24,7 @@ public class Poset<T> extends DirectedGraph<T> {
         super(p);
     }
 
-    /*
+    /**
      * Edge must not ruin antisymmetry.
      */
 
@@ -39,7 +39,7 @@ public class Poset<T> extends DirectedGraph<T> {
         transposedList.get(e.to).add(e.transpose());
     }
 
-    /*
+    /**
      * Removes only direct edges between vertices.
      */
 
@@ -48,7 +48,7 @@ public class Poset<T> extends DirectedGraph<T> {
         super.removeEdge(e);
     }
 
-    /*
+    /**
      * Also checks transitive edges.
      */
 

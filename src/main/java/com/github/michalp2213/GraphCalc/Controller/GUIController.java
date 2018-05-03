@@ -1,17 +1,18 @@
 package com.github.michalp2213.GraphCalc.Controller;
 
+import com.github.michalp2213.GraphCalc.Model.*;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.shape.Line;
 
 
 public class GUIController {
+    private final int RADIUS = 5;
     public Button fileButton;
     public Button addVerticesButton;
     public Button addEdgesButton;
@@ -27,7 +28,7 @@ public class GUIController {
     public Button openButton;
     public Button saveButton;
     public Button saveAsButton;
-    public Canvas workspace;
+    public Pane workspace;
     public GridPane mainFrame;
     public GridPane newMenu;
     public ComboBox graphTypeBox;
@@ -35,6 +36,11 @@ public class GUIController {
     public TextField pathField;
     public Button newMenuExitButton;
     public Button newMenuAcceptButton;
+    public Graph<Circle> graph = new UndirectedGraph<>();
+    public Circle c1, c2;
+    private boolean addVerticesMode = false;
+    private boolean addEdgesMode = false;
+    private boolean removeObjects = false;
 
     @FXML
     public void showFileMenu(){
@@ -61,5 +67,49 @@ public class GUIController {
     public void newMenuAcceptAndExit(ActionEvent event){
         //todo
         newMenu.setVisible(false);
+    }
+    @FXML
+    public void addVertices(MouseEvent mouseEvent) {
+        addVerticesMode = !addVerticesMode;
+    }
+
+    public void addEdges(MouseEvent mouseEvent) {
+        addEdgesMode = !addEdgesMode;
+    }
+
+    public void workspaceClicked(MouseEvent mouseEvent) {
+        if(addVerticesMode){
+            Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
+            workspace.getChildren().add(c);
+            graph.addVertex(new CircleVertex(c, workspace));
+            EventHandler<MouseEvent> vertexClicked = e -> {
+                if(removeObjects){
+                    graph.removeVertex(new CircleVertex(c, workspace));
+                }
+                else if(addEdgesMode){
+                    if(c1 == null) c1 = c;
+                    else if(c2 == null){
+                        c2 = c;
+                        Line l = new Line(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
+                        Circle a = c1, b = c2;
+                        EventHandler<MouseEvent> edgeClicked = event -> {
+                            if(removeObjects){
+                                graph.removeEdge(new LineEdge(new CircleVertex(a, workspace), new CircleVertex(b, workspace), l, workspace));
+                            }
+                        };
+                        l.addEventFilter(MouseEvent.MOUSE_CLICKED, edgeClicked);
+                        graph.addEdge(new LineEdge(new CircleVertex(c1, workspace), new CircleVertex(c2, workspace), l, workspace));
+                        workspace.getChildren().add(l);
+                        c1 = null;
+                        c2 = null;
+                    }
+                }
+            };
+            c.addEventFilter(MouseEvent.MOUSE_CLICKED, vertexClicked);
+        }
+    }
+
+    public void removeObjects(MouseEvent mouseEvent) {
+        removeObjects = !removeObjects;
     }
 }

@@ -1,14 +1,22 @@
 package com.github.michalp2213.GraphCalc.Model;
 
-/*
+/**
  * Class describing vertex.
  */
 
 public class Vertex<T> {
-    private final T v;
+    protected final T v;
 
     public Vertex(T v) {
         this.v = v;
+    }
+
+    /**
+     * Function that will be called before removing edge from graph.
+     */
+
+    public void finishIt(){
+
     }
 
     @Override

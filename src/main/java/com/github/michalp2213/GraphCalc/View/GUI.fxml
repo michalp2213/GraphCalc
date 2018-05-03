@@ -34,6 +34,7 @@
                     minWidth="70"
                     maxHeight="50"
                     minHeight="50"
+                    onMouseClicked="#addVertices"
                     textAlignment="CENTER"/>
 
             <Button fx:id="addEdgesButton"
@@ -42,6 +43,7 @@
                     minWidth="70"
                     maxHeight="50"
                     minHeight="50"
+                    onMouseClicked="#addEdges"
                     textAlignment="CENTER"/>
 
             <Button fx:id="removeObjectsButton"
@@ -50,6 +52,7 @@
                     minWidth="70"
                     maxHeight="50"
                     minHeight="50"
+                    onMouseClicked="#removeObjects"
                     textAlignment="CENTER"/>
 
         </VBox>
@@ -119,12 +122,13 @@
                 minHeight="25"/>
     </VBox>
 
-    <Canvas fx:id="workspace"
+    <Pane fx:id="workspace"
             GridPane.rowIndex="0"
             GridPane.columnIndex="1"
             GridPane.columnSpan="3"
-            GridPane.rowSpan="3">
-    </Canvas>
+            GridPane.rowSpan="3"
+            onMouseClicked="#workspaceClicked">
+    </Pane>
 
 
     <GridPane fx:id="newMenu"

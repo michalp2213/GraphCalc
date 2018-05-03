@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-/*
+/**
  * Class describing directed graph. Null as vertex isn't accepted.
  */
 
@@ -13,7 +13,7 @@ public class DirectedGraph<T> implements Graph<T> {
     protected HashMap<Vertex<T>, HashSet<Edge<T>>> list;
     protected HashMap<Vertex<T>, HashSet<Edge<T>>> transposedList;
 
-    /*
+    /**
      * Basic constructor.
      */
 
@@ -22,7 +22,7 @@ public class DirectedGraph<T> implements Graph<T> {
         transposedList = new HashMap<>();
     }
 
-    /*
+    /**
      * Copying constructor.
      */
 
@@ -32,7 +32,7 @@ public class DirectedGraph<T> implements Graph<T> {
         transposedList = new HashMap<>(g.transposedList);
     }
 
-    /*
+    /**
      * Get read-only adjacency list that represents graph.
      */
 
@@ -40,7 +40,7 @@ public class DirectedGraph<T> implements Graph<T> {
         return Collections.unmodifiableMap(list);
     }
 
-    /*
+    /**
      * Return new graph that has transposed edges.
      */
 
@@ -74,11 +74,13 @@ public class DirectedGraph<T> implements Graph<T> {
     public void removeVertex(Vertex<T> v) {
         if (v == null) throw new NullPointerException();
         for(Edge<T> e : transposedList.get(v)){
+            e.finishIt();
             list.get(e.to).remove(e.transpose());
         }
         for(Edge<T> e : list.get(v)){
             transposedList.get(e.to).remove(e.transpose());
         }
+        v.finishIt();
         list.remove(v);
         transposedList.remove(v);
     }
@@ -88,6 +90,7 @@ public class DirectedGraph<T> implements Graph<T> {
         if (e == null) throw new NullPointerException();
         HashSet<Edge<T>> set = list.get(e.from);
         if (set == null) return;
+        e.finishIt();
         set.remove(e);
         set = transposedList.get(e.to);
         set.remove(e.transpose());

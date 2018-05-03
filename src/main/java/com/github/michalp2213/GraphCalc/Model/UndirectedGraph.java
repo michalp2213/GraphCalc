@@ -5,14 +5,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-/*
+/**
  * Class describing undirected graph. Null as vertex isn't accepted.
  */
 
 public class UndirectedGraph<T> implements Graph<T> {
     protected HashMap<Vertex<T>, HashSet<Edge<T>>> list;
 
-    /*
+    /**
      * Basic constructor.
      */
 
@@ -20,7 +20,7 @@ public class UndirectedGraph<T> implements Graph<T> {
         list = new HashMap<>();
     }
 
-    /*
+    /**
      * Copying constructor
      */
 
@@ -29,7 +29,7 @@ public class UndirectedGraph<T> implements Graph<T> {
         list = new HashMap<>(g.list);
     }
 
-    /*
+    /**
      * Get read-only adjacency list that represents graph.
      */
 
@@ -55,9 +55,12 @@ public class UndirectedGraph<T> implements Graph<T> {
     @Override
     public void removeVertex(Vertex<T> v) {
         if (v == null) throw new NullPointerException();
+        v.finishIt();
         HashSet<Edge<T>> set = list.remove(v);
         if (set == null) return;
         for (Edge<T> e : set) {
+            e.finishIt();
+            e.transpose().finishIt();
             list.get(e.to).remove(e.transpose());
         }
     }
@@ -67,7 +70,9 @@ public class UndirectedGraph<T> implements Graph<T> {
         if (e == null) throw new NullPointerException();
         HashSet<Edge<T>> set = list.get(e.from);
         if (set == null) return;
+        e.finishIt();
         set.remove(e);
+        e.transpose().finishIt();
         list.get(e.to).remove(e.transpose());
     }
 

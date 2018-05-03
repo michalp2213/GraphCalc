@@ -10,9 +10,9 @@ import java.util.Objects;
 public class Edge<T> {
     public final Vertex<T> from;
     public final Vertex<T> to;
-    public HashMap<Class, Object> attributes;
+    protected HashMap<Class, Object> attributes;
 
-    /*
+    /**
      * Basic constructor.
      */
 
@@ -20,7 +20,7 @@ public class Edge<T> {
         this(from, to, new HashMap<>());
     }
 
-    /*
+    /**
      * Constructor for edge with attributes.
      */
 
@@ -34,12 +34,23 @@ public class Edge<T> {
         return new Edge<>(to, from, attributes);
     }
 
-    /*
+    /**
      * Adding new attribute, or changing existing.
      */
 
-    public void addAttribute(Object o) {
+    public void setAttribute(Object o) {
         attributes.put(o.getClass(), o);
+    }
+
+    public Object getAttribute(Class cl){
+        return attributes.get(cl);
+    }
+
+    /**
+     * Function that will be called before removing edge from graph.
+     */
+
+    public void finishIt(){
     }
 
     @Override
