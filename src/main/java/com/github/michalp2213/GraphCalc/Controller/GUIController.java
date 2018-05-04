@@ -4,16 +4,23 @@ import com.github.michalp2213.GraphCalc.Model.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.shape.Circle;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 
 
 public class GUIController {
-    private final int RADIUS = 5;
+    private static final int RADIUS = 5;
     public Button fileButton;
     public Button addVerticesButton;
     public Button addEdgesButton;
@@ -37,12 +44,12 @@ public class GUIController {
     public TextField pathField;
     public Button newMenuExitButton;
     public Button newMenuAcceptButton;
-    public Graph<Circle> graph = new UndirectedGraph<>();
+    public Graph<Circle> graph;
     public Circle c1, c2;
     public Text pathFieldTitle;
     private boolean addVerticesMode = false;
     private boolean addEdgesMode = false;
-    private boolean removeObjects = false;
+    private boolean removeObjectsMode = false;
 
     @FXML
     public void showFileMenu() {
@@ -84,52 +91,34 @@ public class GUIController {
 
     @FXML
     public void newMenuAcceptAndExit(ActionEvent event) {
-        switch (graphTypeBox.getSelectionModel().getSelectedItem()){
+        switch (graphTypeBox.getSelectionModel().getSelectedItem()) {
             case "Undirected":
-                switch(sourceTypeBox.getSelectionModel().getSelectedItem()){
-                    case "Clear":
-                        System.out.println("mniam");
-                        break;
-                    case "Adjacency lists":
-                        //todo
-                        break;
-                    case "Adjacency matrix":
-                        //todo
-                        break;
-                }
+                graph = new UndirectedGraph<>();
                 break;
             case "Directed":
-                switch(sourceTypeBox.getSelectionModel().getSelectedItem()){
-                    case "Clear":
-                        //todo
-                        break;
-                    case "Adjacency lists":
-                        //todo
-                        break;
-                    case "Adjacency matrix":
-                        //todo
-                        break;
-                }
+                graph = new DirectedGraph<>();
                 break;
             case "Poset":
-                switch(sourceTypeBox.getSelectionModel().getSelectedItem()){
-                    case "Clear":
-                        //todo
-                        break;
-                    case "Adjacency lists":
-                        //todo
-                        break;
-                    case "Adjacency matrix":
-                        //todo
-                        break;
-                }
+                graph = new Poset<>();
                 break;
         }
+        workspace.getChildren().clear();
+        switch (sourceTypeBox.getSelectionModel().getSelectedItem()) {
+            case "Clear":
+                break;
+            case "Adjacency lists":
+                //todo
+                break;
+            case "Adjacency matrix":
+                //todo
+                break;
+        }
+
         newMenuExit(event);
     }
 
     @FXML
-    public void showPath(ActionEvent event){
+    public void showPath(ActionEvent event) {
         pathField.setVisible(!(sourceTypeBox.getSelectionModel().getSelectedItem() != null &&
                 sourceTypeBox.getSelectionModel().getSelectedItem().equals("Clear")));
         pathFieldTitle.setVisible(!(sourceTypeBox.getSelectionModel().getSelectedItem() != null &&
@@ -137,7 +126,7 @@ public class GUIController {
     }
 
     @FXML
-    public void hidePath(ActionEvent even){
+    public void hidePath(ActionEvent even) {
         pathFieldTitle.setVisible(false);
         pathField.setVisible(false);
     }
@@ -165,8 +154,14 @@ public class GUIController {
         addVerticesMode = !addVerticesMode;
     }
 
+    @FXML
     public void addEdges(MouseEvent mouseEvent) {
         addEdgesMode = !addEdgesMode;
+    }
+
+    @FXML
+    public void removeObjects(MouseEvent mouseEvent) {
+        removeObjectsMode = !removeObjectsMode;
     }
 
     public void workspaceClicked(MouseEvent mouseEvent) {
@@ -175,22 +170,31 @@ public class GUIController {
             workspace.getChildren().add(c);
             graph.addVertex(new CircleVertex(c, workspace));
             EventHandler<MouseEvent> vertexClicked = e -> {
-                if (removeObjects) {
+                if (removeObjectsMode) {
                     graph.removeVertex(new CircleVertex(c, workspace));
                 } else if (addEdgesMode) {
-                    if (c1 == null) c1 = c;
-                    else if (c2 == null) {
+                    if (c1 == null) {
+                        c1 = c;
+                        c.setFill(Color.RED);
+                    } else if (c2 == null) {
                         c2 = c;
-                        Line l = new Line(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
+                        Node l = getLine();
                         Circle a = c1, b = c2;
                         EventHandler<MouseEvent> edgeClicked = event -> {
-                            if (removeObjects) {
+                            if (removeObjectsMode) {
                                 graph.removeEdge(new LineEdge(new CircleVertex(a, workspace), new CircleVertex(b, workspace), l, workspace));
                             }
                         };
                         l.addEventFilter(MouseEvent.MOUSE_CLICKED, edgeClicked);
-                        graph.addEdge(new LineEdge(new CircleVertex(c1, workspace), new CircleVertex(c2, workspace), l, workspace));
-                        workspace.getChildren().add(l);
+                        try {
+                            graph.addEdge(new LineEdge(new CircleVertex(c1, workspace), new CircleVertex(c2, workspace), l, workspace));
+                            workspace.getChildren().add(l);
+                        } catch (IllegalArgumentException exception) {
+
+                        }
+                        c1.setFill(Color.BLACK);
+                        c1.toFront();
+                        c2.toFront();
                         c1 = null;
                         c2 = null;
                     }
@@ -200,7 +204,13 @@ public class GUIController {
         }
     }
 
-    public void removeObjects(MouseEvent mouseEvent) {
-        removeObjects = !removeObjects;
+    private Node getLine() {
+        Node line;
+        if (graph.getClass().equals(UndirectedGraph.class)) {
+            line = new Line(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
+        } else {
+            line = new DirectedLine(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
+        }
+        return line;
     }
 }

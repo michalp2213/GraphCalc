@@ -78,6 +78,7 @@ public class DirectedGraph<T> implements Graph<T> {
             list.get(e.to).remove(e.transpose());
         }
         for(Edge<T> e : list.get(v)){
+            e.finishIt();
             transposedList.get(e.to).remove(e.transpose());
         }
         v.finishIt();
