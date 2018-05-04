@@ -13,7 +13,10 @@
           xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.github.michalp2213.GraphCalc.Controller.GUIController"
-          prefHeight="600" prefWidth="800.0">
+          minWidth="800"
+          maxWidth="10000"
+          minHeight="600"
+          maxHeight="100000">
     <VBox fx:id="leftSideButtons"
           GridPane.columnIndex="0"
           GridPane.rowIndex="0"
@@ -130,9 +133,9 @@
             GridPane.columnIndex="1"
             GridPane.columnSpan="3"
             GridPane.rowSpan="3"
-            maxWidth="Infinity"
+            maxWidth="10000000"
             minWidth="730"
-            maxHeight="Infinity"
+            maxHeight="10000000"
             minHeight="600"
             onMouseClicked="#workspaceClicked">
     </Pane>
@@ -159,25 +162,29 @@
                 Source:
             </Text>
             <ComboBox fx:id="sourceTypeBox"
-                      minWidth="100"/>
+                      minWidth="100"
+                      onAction="#showPath"/>
         </HBox>
-        <Text GridPane.columnIndex="0"
+        <Text fx:id="pathFieldTitle"
+              GridPane.columnIndex="0"
               GridPane.rowIndex="1"
               GridPane.valignment="CENTER"
-              GridPane.halignment="RIGHT">
+              GridPane.halignment="RIGHT"
+              visible="false">
             Path:
         </Text>
         <TextField fx:id="pathField"
                    GridPane.columnIndex="1"
                    GridPane.rowIndex="1"
                    GridPane.valignment="CENTER"
-                   GridPane.halignment="CENTER"/>
+                   GridPane.halignment="CENTER"
+                   visible="false"/>
         <HBox GridPane.columnIndex="1"
               GridPane.rowIndex="2"
               alignment="CENTER_RIGHT">
             <Button fx:id="newMenuExitButton"
                     text="Cancel"
-                    onAction="#newMenuCancelAndExit"/>
+                    onAction="#newMenuExit"/>
             <Button fx:id="newMenuAcceptButton"
                     text="Ok"
                     onAction="#newMenuAcceptAndExit"/>

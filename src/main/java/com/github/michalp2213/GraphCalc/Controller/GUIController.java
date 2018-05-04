@@ -9,6 +9,7 @@ import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 
 
 public class GUIController {
@@ -38,6 +39,7 @@ public class GUIController {
     public Button newMenuAcceptButton;
     public Graph<Circle> graph = new UndirectedGraph<>();
     public Circle c1, c2;
+    public Text pathFieldTitle;
     private boolean addVerticesMode = false;
     private boolean addEdgesMode = false;
     private boolean removeObjects = false;
@@ -66,19 +68,78 @@ public class GUIController {
                     "Adjacency lists",
                     "Adjacency matrix");
         }
+        graphTypeBox.getSelectionModel().selectFirst();
+        sourceTypeBox.getSelectionModel().selectFirst();
         hideFileMenu();
     }
 
     @FXML
-    public void newMenuCancelAndExit(ActionEvent event) {
+    public void newMenuExit(ActionEvent event) {
         //todo
+        graphTypeBox.getSelectionModel().clearSelection();
+        sourceTypeBox.getSelectionModel().clearSelection();
+        hidePath(event);
         newMenu.setVisible(false);
     }
 
     @FXML
     public void newMenuAcceptAndExit(ActionEvent event) {
-        //todo
-        newMenu.setVisible(false);
+        switch (graphTypeBox.getSelectionModel().getSelectedItem()){
+            case "Undirected":
+                switch(sourceTypeBox.getSelectionModel().getSelectedItem()){
+                    case "Clear":
+                        System.out.println("mniam");
+                        break;
+                    case "Adjacency lists":
+                        //todo
+                        break;
+                    case "Adjacency matrix":
+                        //todo
+                        break;
+                }
+                break;
+            case "Directed":
+                switch(sourceTypeBox.getSelectionModel().getSelectedItem()){
+                    case "Clear":
+                        //todo
+                        break;
+                    case "Adjacency lists":
+                        //todo
+                        break;
+                    case "Adjacency matrix":
+                        //todo
+                        break;
+                }
+                break;
+            case "Poset":
+                switch(sourceTypeBox.getSelectionModel().getSelectedItem()){
+                    case "Clear":
+                        //todo
+                        break;
+                    case "Adjacency lists":
+                        //todo
+                        break;
+                    case "Adjacency matrix":
+                        //todo
+                        break;
+                }
+                break;
+        }
+        newMenuExit(event);
+    }
+
+    @FXML
+    public void showPath(ActionEvent event){
+        pathField.setVisible(!(sourceTypeBox.getSelectionModel().getSelectedItem() != null &&
+                sourceTypeBox.getSelectionModel().getSelectedItem().equals("Clear")));
+        pathFieldTitle.setVisible(!(sourceTypeBox.getSelectionModel().getSelectedItem() != null &&
+                sourceTypeBox.getSelectionModel().getSelectedItem().equals("Clear")));
+    }
+
+    @FXML
+    public void hidePath(ActionEvent even){
+        pathFieldTitle.setVisible(false);
+        pathField.setVisible(false);
     }
 
     @FXML
