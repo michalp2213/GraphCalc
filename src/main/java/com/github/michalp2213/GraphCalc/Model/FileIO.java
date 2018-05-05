@@ -7,21 +7,23 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import javafx.scene.shape.Circle;
-
 public class FileIO {
-	public static Graph <Circle> readFromFile(File file) throws IOException {
+	public static <T> Graph <T> readFromFile(File file) throws IOException {
 		if (file == null)
 			return null;
 		
-		Graph <Circle> ret = null;
+		Graph <T> ret = null;
 		
 		ObjectInputStream input = null;
 		try {
 			input = new ObjectInputStream(new FileInputStream(file));
 			
-			ret = (Graph <Circle>) input.readObject();
+			Object tmp = input.readObject();
 			
+			//TODO: figure out a check if read Graph really stores T
+			if (tmp instanceof Graph) {
+				ret = (Graph <T>) tmp;
+			}
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e);
 		} finally {
@@ -37,7 +39,7 @@ public class FileIO {
 		return ret;
 	}
 	
-	public static void writeToFile(File file, Graph <Circle> data) throws IOException {
+	public static <T> void writeToFile(File file, Graph <T> data) throws IOException {
 		if (file == null || data == null)
 			return;
 		
