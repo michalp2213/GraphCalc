@@ -265,17 +265,20 @@ public class GUIController {
 
     private Node getLine() {
         Node line;
+        double startX = c1.getCenterX(), startY = c1.getCenterY(), endX = c2.getCenterX(), endY = c2.getCenterY();
         double vecLength = Math.sqrt((c1.getCenterX() + c2.getCenterX())*(c1.getCenterX() + c2.getCenterX())+
                 (c1.getCenterY() + c2.getCenterY())*(c1.getCenterY() + c2.getCenterY()));
-        double unitVecX = (c2.getCenterX() - c1.getCenterX())/vecLength;
-        double unitVecY = (c2.getCenterY() - c1.getCenterY())/vecLength;
-        double midX = (c1.getCenterX() + c2.getCenterX())/2;
-        double midY = (c1.getCenterY() + c2.getCenterY())/2;
-        double distFromMid = vecLength/2 - RADIUS;
-        double startX = midX - distFromMid*unitVecX;
-        double startY = midY - distFromMid*unitVecY;
-        double endX = midX + distFromMid*unitVecX;
-        double endY = midY + distFromMid*unitVecY;
+        if (vecLength != 0) {
+            double unitVecX = (c2.getCenterX() - c1.getCenterX()) / vecLength;
+            double unitVecY = (c2.getCenterY() - c1.getCenterY()) / vecLength;
+            double midX = (c1.getCenterX() + c2.getCenterX()) / 2;
+            double midY = (c1.getCenterY() + c2.getCenterY()) / 2;
+            double distFromMid = vecLength / 2 - RADIUS;
+            startX = midX - distFromMid * unitVecX;
+            startY = midY - distFromMid * unitVecY;
+            endX = midX + distFromMid * unitVecX;
+            endY = midY + distFromMid * unitVecY;
+        }
         if (graph.getClass().equals(UndirectedGraph.class)) {
             line = new Line(startX, startY, endX, endY);
         } else {
@@ -289,5 +292,13 @@ public class GUIController {
         alert.setHeaderText(message);
         alert.setContentText(message2);
         alert.showAndWait();
+    }
+
+    private void moveVertex(Vertex<Circle> v, double toX, double toY){
+        //todo
+    }
+
+    private void spreadVerticesEvenly(){
+        //todo
     }
 }
