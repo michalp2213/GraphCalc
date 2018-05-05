@@ -41,6 +41,14 @@ public class DirectedGraph<T> implements Graph<T>, Serializable {
     }
 
     /**
+     * Get read-only transposed adjacency list that represents graph.
+     */
+
+    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getTransposedAdjacencyList() {
+        return Collections.unmodifiableMap(transposedList);
+    }
+
+    /**
      * Return new graph that has transposed edges.
      */
 

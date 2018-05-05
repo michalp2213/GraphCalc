@@ -11,6 +11,8 @@ public interface Graph<T> {
 
     Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList();
 
+    Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getTransposedAdjacencyList();
+
     void addVertex(Vertex<T> v);
 
     void addEdge(Edge<T> e);

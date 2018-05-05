@@ -36,6 +36,10 @@ public class UndirectedGraph<T> implements Graph<T> {
         return Collections.unmodifiableMap(list);
     }
 
+    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getTransposedAdjacencyList() {
+        return Collections.unmodifiableMap(list);
+    }
+
     @Override
     public void addVertex(Vertex<T> v) {
         if (v == null) throw new NullPointerException();
