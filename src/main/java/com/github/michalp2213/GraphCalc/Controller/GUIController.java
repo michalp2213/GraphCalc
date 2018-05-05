@@ -117,7 +117,9 @@ public class GUIController {
                 //todo
                 break;
         }
-
+        if (graph.getAdjacencyList().keySet().size() > 0) {
+            spreadVerticesEvenly();
+        }
         newMenuExit(event);
     }
 
@@ -294,11 +296,23 @@ public class GUIController {
         alert.showAndWait();
     }
 
-    private void moveVertex(Vertex<Circle> v, double toX, double toY){
+    private void moveVertex(CircleVertex v, double toX, double toY){
         //todo
     }
 
     private void spreadVerticesEvenly(){
-        //todo
+        double midX = workspace.getWidth()/2;
+        double midY = workspace.getHeight()/2;
+        double polygonRadius = Math.min(midX/2, midY/2);
+        int k = graph.getAdjacencyList().keySet().size();
+        int j = 0;
+        for (Vertex<Circle> vT : graph.getAdjacencyList().keySet()){
+            CircleVertex v = (CircleVertex) vT;
+            double arg = (2*j*Math.PI)/k;
+            double toX = Math.cos(arg)*polygonRadius + midX;
+            double toY = Math.sin(arg)*polygonRadius + midY;
+            moveVertex(v, toX, toY);
+            j++;
+        }
     }
 }
