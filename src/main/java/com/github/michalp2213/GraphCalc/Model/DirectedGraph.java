@@ -1,5 +1,6 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -7,7 +8,9 @@ import java.util.HashSet;
  * Class describing directed graph.
  */
 
-public class DirectedGraph<T> implements Graph<T> {
+public class DirectedGraph<T> implements Graph<T>, Serializable {
+	static final long serialVersionUID = 01L;
+
     public HashMap<Vertex<T>, HashSet<Edge<T>>> list;
 
     /*
