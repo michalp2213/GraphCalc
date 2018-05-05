@@ -5,10 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -44,7 +41,7 @@ public class GUIController {
     public TextField pathField;
     public Button newMenuExitButton;
     public Button newMenuAcceptButton;
-    public Graph<Circle> graph;
+    public Graph<Circle> graph = new UndirectedGraph<>();
     public Circle c1, c2;
     public Text pathFieldTitle;
     private boolean addVerticesMode = false;
@@ -151,19 +148,36 @@ public class GUIController {
 
     @FXML
     public void addVertices(MouseEvent mouseEvent) {
-        addVerticesMode = !addVerticesMode;
+        if (changeMode(addVerticesMode, addVerticesButton, addEdgesMode, removeObjectsMode))
+            addVerticesMode = !addVerticesMode;
     }
 
     @FXML
     public void addEdges(MouseEvent mouseEvent) {
-        addEdgesMode = !addEdgesMode;
+        if (changeMode(addEdgesMode, addEdgesButton, addVerticesMode, removeObjectsMode))
+            addEdgesMode = !addEdgesMode;
     }
 
     @FXML
     public void removeObjects(MouseEvent mouseEvent) {
-        removeObjectsMode = !removeObjectsMode;
+        if (changeMode(removeObjectsMode, removeObjectsButton, addVerticesMode, addEdgesMode))
+            removeObjectsMode = !removeObjectsMode;
     }
 
+    private boolean changeMode(boolean mode, Button button, boolean mode2, boolean mode3) {
+        if (mode) {
+            button.getStyleClass().removeAll("actionButton");
+        } else {
+            if (mode2 || mode3) {
+                showAlert("Forbidden", "You cannot enter this editing mode\n without exiting previous.");
+                return false;
+            }
+            button.getStyleClass().add("actionButton");
+        }
+        return true;
+    }
+
+    @FXML
     public void workspaceClicked(MouseEvent mouseEvent) {
         if (addVerticesMode) {
             Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
@@ -187,10 +201,12 @@ public class GUIController {
                         };
                         l.addEventFilter(MouseEvent.MOUSE_CLICKED, edgeClicked);
                         try {
-                            graph.addEdge(new LineEdge(new CircleVertex(c1, workspace), new CircleVertex(c2, workspace), l, workspace));
-                            workspace.getChildren().add(l);
+                            if (!graph.containsEdge(new LineEdge(new CircleVertex(c1, workspace), new CircleVertex(c2, workspace), l, workspace))) {
+                                graph.addEdge(new LineEdge(new CircleVertex(c1, workspace), new CircleVertex(c2, workspace), l, workspace));
+                                workspace.getChildren().add(l);
+                            }
                         } catch (IllegalArgumentException exception) {
-
+                            showAlert("Wrong edge", "This edge cannot be inserted into poset.");
                         }
                         c1.setFill(Color.BLACK);
                         c1.toFront();
@@ -212,5 +228,12 @@ public class GUIController {
             line = new DirectedLine(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
         }
         return line;
+    }
+
+    private void showAlert(String message, String message2) {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setHeaderText(message);
+        alert.setContentText(message2);
+        alert.showAndWait();
     }
 }

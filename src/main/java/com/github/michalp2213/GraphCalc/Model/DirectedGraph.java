@@ -44,7 +44,7 @@ public class DirectedGraph<T> implements Graph<T> {
      * Return new graph that has transposed edges.
      */
 
-    public DirectedGraph<T> transpose(){
+    public DirectedGraph<T> transpose() {
         DirectedGraph<T> g = new DirectedGraph<>(this);
         HashMap<Vertex<T>, HashSet<Edge<T>>> temp = g.list;
         g.list = g.transposedList;
@@ -73,11 +73,11 @@ public class DirectedGraph<T> implements Graph<T> {
     @Override
     public void removeVertex(Vertex<T> v) {
         if (v == null) throw new NullPointerException();
-        for(Edge<T> e : transposedList.get(v)){
+        for (Edge<T> e : transposedList.get(v)) {
             e.finishIt();
             list.get(e.to).remove(e.transpose());
         }
-        for(Edge<T> e : list.get(v)){
+        for (Edge<T> e : list.get(v)) {
             e.finishIt();
             transposedList.get(e.to).remove(e.transpose());
         }
@@ -94,7 +94,7 @@ public class DirectedGraph<T> implements Graph<T> {
         e.finishIt();
         set.remove(e);
         set = transposedList.get(e.to);
-        set.remove(e.transpose());
+        if (set != null) set.remove(e.transpose());
     }
 
     @Override
