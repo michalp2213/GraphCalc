@@ -4,7 +4,13 @@ package com.github.michalp2213.GraphCalc.Model;
  * Graph interface describing basic operations on graph.
  */
 
+import java.util.HashSet;
+import java.util.Map;
+
 public interface Graph<T> {
+
+    Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList();
+
     void addVertex(Vertex<T> v);
 
     void addEdge(Edge<T> e);

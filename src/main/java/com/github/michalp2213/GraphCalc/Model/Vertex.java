@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class Vertex<T> implements Serializable {
 	static final long serialVersionUID = 01L;
 	
-    protected final T v;
+    public final T v;
 
     public Vertex(T v) {
         this.v = v;
