@@ -1,6 +1,7 @@
 package com.github.michalp2213.GraphCalc.Model;
 
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * Class describing poset(partially ordered set). Null as vertex isn't accepted.
