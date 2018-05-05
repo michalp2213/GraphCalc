@@ -111,7 +111,6 @@ public class GUIController {
             case "Clear":
                 break;
             case "Adjacency lists":
-                //todo
                 break;
             case "Adjacency matrix":
                 //todo
@@ -209,7 +208,7 @@ public class GUIController {
                         c.setFill(Color.RED);
                     } else if (c2 == null) {
                         c2 = c;
-                        Node l = getLine();
+                        Node l = getLine(c1, c2);
                         Circle a = c1, b = c2;
                         EventHandler<MouseEvent> edgeClicked = event -> {
                             if (removeObjectsMode) {
@@ -263,16 +262,16 @@ public class GUIController {
         }
     }
 
-    private Node getLine() {
+    private Node getLine(Circle a, Circle b) {
         Node line;
-        double startX = c1.getCenterX(), startY = c1.getCenterY(), endX = c2.getCenterX(), endY = c2.getCenterY();
-        double vecLength = Math.sqrt((c1.getCenterX() + c2.getCenterX())*(c1.getCenterX() + c2.getCenterX())+
-                (c1.getCenterY() + c2.getCenterY())*(c1.getCenterY() + c2.getCenterY()));
+        double startX = a.getCenterX(), startY = a.getCenterY(), endX = b.getCenterX(), endY = b.getCenterY();
+        double vecLength = Math.sqrt((a.getCenterX() + b.getCenterX())*(a.getCenterX() + b.getCenterX())+
+                (a.getCenterY() + b.getCenterY())*(a.getCenterY() + b.getCenterY()));
         if (vecLength != 0) {
-            double unitVecX = (c2.getCenterX() - c1.getCenterX()) / vecLength;
-            double unitVecY = (c2.getCenterY() - c1.getCenterY()) / vecLength;
-            double midX = (c1.getCenterX() + c2.getCenterX()) / 2;
-            double midY = (c1.getCenterY() + c2.getCenterY()) / 2;
+            double unitVecX = (b.getCenterX() - a.getCenterX()) / vecLength;
+            double unitVecY = (b.getCenterY() - a.getCenterY()) / vecLength;
+            double midX = (a.getCenterX() + b.getCenterX()) / 2;
+            double midY = (a.getCenterY() + b.getCenterY()) / 2;
             double distFromMid = vecLength / 2 - RADIUS;
             startX = midX - distFromMid * unitVecX;
             startY = midY - distFromMid * unitVecY;
@@ -294,8 +293,38 @@ public class GUIController {
         alert.showAndWait();
     }
 
-    private void moveVertex(Vertex<Circle> v, double toX, double toY){
-        //todo
+    private void moveVertex(CircleVertex v, double toX, double toY){
+        Circle c = new Circle(toX, toY, RADIUS);
+        for (Edge<Circle> e : graph.getAdjacencyList().get(v)){
+            LineEdge le = (LineEdge) e;
+            if(graph.getClass().equals(UndirectedGraph.class)){
+                Line l = (Line) le.line;
+                Line temp;
+                if(le.to.equals(v)){
+                    temp =(Line) getLine(le.from.v, c);
+                }else {
+                    temp =(Line) getLine(c, le.to.v);
+                }
+                l.setStartX(temp.getStartX());
+                l.setStartY(temp.getStartY());
+                l.setEndX(temp.getEndX());
+                l.setEndY(temp.getEndY());
+            } else{
+                DirectedLine l = (DirectedLine) le.line;
+                DirectedLine temp;
+                if(le.to.equals(v)){
+                    temp =(DirectedLine) getLine(le.from.v, c);
+                }else {
+                    temp =(DirectedLine) getLine(c, le.to.v);
+                }
+                l.setStartX(temp.getStartX());
+                l.setStartY(temp.getStartY());
+                l.setEndX(temp.getEndX());
+                l.setEndY(temp.getEndY());
+            }
+        }
+        v.v.setCenterX(toX);
+        v.v.setCenterY(toY);
     }
 
     private void spreadVerticesEvenly(){
