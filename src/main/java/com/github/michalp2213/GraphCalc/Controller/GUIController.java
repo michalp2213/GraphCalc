@@ -10,6 +10,7 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -37,7 +38,7 @@ public class GUIController {
     public Button saveButton;
     public Button saveAsButton;
     public Pane workspace;
-    public GridPane mainFrame;
+    public AnchorPane mainFrame;
     public GridPane newMenu;
     public ComboBox<String> graphTypeBox;
     public ComboBox<String> sourceTypeBox;

@@ -9,18 +9,19 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.text.Text?>
 
-<GridPane fx:id="mainFrame"
+<AnchorPane fx:id="mainFrame"
           xmlns="http://javafx.com/javafx"
           xmlns:fx="http://javafx.com/fxml"
           fx:controller="com.github.michalp2213.GraphCalc.Controller.GUIController"
           minWidth="800"
-          maxWidth="10000"
+          maxWidth="Infinity"
           minHeight="600"
-          maxHeight="100000">
+          maxHeight="Infinity">
     <VBox fx:id="leftSideButtons"
-          GridPane.columnIndex="0"
-          GridPane.rowIndex="0"
-          spacing="10">
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="70"
+          AnchorPane.topAnchor="0"
+          AnchorPane.bottomAnchor="0">
         <Button fx:id="fileButton"
                 text="File"
                 maxWidth="70"
@@ -29,6 +30,8 @@
                 minHeight="25"
                 onMouseEntered="#showFileMenu"
                 onMouseExited="#hideFileMenu"/>
+
+        <Region VBox.vgrow="ALWAYS"/>
 
         <VBox fx:id="graphOperationButtons">
             <Button fx:id="addVerticesButton"
@@ -60,6 +63,8 @@
 
         </VBox>
 
+        <Region VBox.vgrow="ALWAYS"/>
+
         <VBox fx:id="viewOptionButtons">
             <Button fx:id="zoomInButton"
                     text="Zoom in"
@@ -85,9 +90,9 @@
     </VBox>
 
     <VBox fx:id="fileMenu"
-          GridPane.columnIndex="1"
-          GridPane.rowIndex="0"
-          GridPane.valignment="TOP"
+          AnchorPane.topAnchor="0"
+          AnchorPane.leftAnchor="70"
+          AnchorPane.rightAnchor="140"
           minHeight="100"
           minWidth="70"
           maxHeight="100"
@@ -129,21 +134,22 @@
     </VBox>
 
     <Pane fx:id="workspace"
-            GridPane.rowIndex="0"
-            GridPane.columnIndex="1"
-            GridPane.columnSpan="3"
-            GridPane.rowSpan="3"
-            maxWidth="10000000"
+            AnchorPane.topAnchor="0"
+            AnchorPane.leftAnchor="70"
+            AnchorPane.rightAnchor="0"
+            AnchorPane.bottomAnchor="0"
+            maxWidth="Infinity"
             minWidth="730"
-            maxHeight="10000000"
+            maxHeight="Infinity"
             minHeight="600"
             onMouseClicked="#workspaceClicked">
     </Pane>
 
 
     <GridPane fx:id="newMenu"
-              GridPane.columnIndex="1"
-              GridPane.rowIndex="0"
+              AnchorPane.leftAnchor="250"
+              AnchorPane.topAnchor="200"
+              alignment="CENTER"
               visible="false">
 
         <HBox GridPane.columnIndex="0"
@@ -190,4 +196,4 @@
                     onAction="#newMenuAcceptAndExit"/>
         </HBox>
     </GridPane>
-</GridPane>
+</AnchorPane>
