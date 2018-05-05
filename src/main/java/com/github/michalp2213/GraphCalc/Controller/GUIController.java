@@ -18,7 +18,6 @@ import javafx.scene.text.Text;
 
 
 public class GUIController {
-    private static final int RADIUS = 5;
     public Button fileButton;
     public Button addVerticesButton;
     public Button addEdgesButton;
@@ -41,13 +40,14 @@ public class GUIController {
     public ComboBox<String> sourceTypeBox;
     public TextField pathField;
     public Button newMenuExitButton;
-    public Button newMenuAcceptButton;
-    public Graph<Circle> graph = new UndirectedGraph<>();
-    public Circle c1, c2;
     public Text pathFieldTitle;
-    private boolean addVerticesMode = false;
-    private boolean addEdgesMode = false;
-    private boolean removeObjectsMode = false;
+    public Button newMenuAcceptButton;
+    private Graph<Circle> graph = new UndirectedGraph<>();
+    private Circle c1, c2;
+    private Boolean addVerticesMode = false;
+    private Boolean addEdgesMode = false;
+    private Boolean removeObjectsMode = false;
+    private static final int RADIUS = 5;
 
     @FXML
     public void showFileMenu() {
@@ -149,33 +149,29 @@ public class GUIController {
 
     @FXML
     public void addVertices(MouseEvent mouseEvent) {
-        if (changeMode(addVerticesMode, addVerticesButton, addEdgesMode, removeObjectsMode))
-            addVerticesMode = !addVerticesMode;
+        changeMode(addVerticesMode, addVerticesButton);
+        addVerticesMode = !addVerticesMode;
+        if (addVerticesMode) {
+            changeMode(false, true, true);
+        }
     }
 
     @FXML
     public void addEdges(MouseEvent mouseEvent) {
-        if (changeMode(addEdgesMode, addEdgesButton, addVerticesMode, removeObjectsMode))
-            addEdgesMode = !addEdgesMode;
+        changeMode(addEdgesMode, addEdgesButton);
+        addEdgesMode = !addEdgesMode;
+        if (addEdgesMode) {
+            changeMode(true, false, true);
+        }
     }
 
     @FXML
     public void removeObjects(MouseEvent mouseEvent) {
-        if (changeMode(removeObjectsMode, removeObjectsButton, addVerticesMode, addEdgesMode))
-            removeObjectsMode = !removeObjectsMode;
-    }
-
-    private boolean changeMode(boolean mode, Button button, boolean mode2, boolean mode3) {
-        if (mode) {
-            button.getStyleClass().removeAll("actionButton");
-        } else {
-            if (mode2 || mode3) {
-                showAlert("Forbidden", "You cannot enter this editing mode\n without exiting previous.");
-                return false;
-            }
-            button.getStyleClass().add("actionButton");
+        changeMode(removeObjectsMode, removeObjectsButton);
+        removeObjectsMode = !removeObjectsMode;
+        if (removeObjectsMode) {
+            changeMode(true, true, false);
         }
-        return true;
     }
 
     @FXML
@@ -197,13 +193,16 @@ public class GUIController {
                         Circle a = c1, b = c2;
                         EventHandler<MouseEvent> edgeClicked = event -> {
                             if (removeObjectsMode) {
-                                graph.removeEdge(new LineEdge(new CircleVertex(a, workspace), new CircleVertex(b, workspace), l, workspace));
+                                graph.removeEdge(new LineEdge(new CircleVertex(a, workspace),
+                                        new CircleVertex(b, workspace), l, workspace));
                             }
                         };
                         l.addEventFilter(MouseEvent.MOUSE_CLICKED, edgeClicked);
                         try {
-                            if (!graph.containsEdge(new LineEdge(new CircleVertex(c1, workspace), new CircleVertex(c2, workspace), l, workspace))) {
-                                graph.addEdge(new LineEdge(new CircleVertex(c1, workspace), new CircleVertex(c2, workspace), l, workspace));
+                            if (!graph.containsEdge(new LineEdge(new CircleVertex(c1, workspace),
+                                    new CircleVertex(c2, workspace), l, workspace))) {
+                                graph.addEdge(new LineEdge(new CircleVertex(c1, workspace),
+                                        new CircleVertex(c2, workspace), l, workspace));
                                 workspace.getChildren().add(l);
                             }
                         } catch (IllegalArgumentException exception) {
@@ -218,6 +217,29 @@ public class GUIController {
                 }
             };
             c.addEventFilter(MouseEvent.MOUSE_CLICKED, vertexClicked);
+        }
+    }
+
+    private void changeMode(Boolean mode, Button button) {
+        if (mode) {
+            button.getStyleClass().removeAll("actionButton");
+        } else {
+            button.getStyleClass().add("actionButton");
+        }
+    }
+
+    private void changeMode(Boolean b1, Boolean b2, Boolean b3) {
+        if (b1) {
+            changeMode(true, addVerticesButton);
+            addVerticesMode = false;
+        }
+        if (b2) {
+            changeMode(true, addEdgesButton);
+            addEdgesMode = false;
+        }
+        if (b3) {
+            changeMode(true, removeObjectsButton);
+            removeObjectsMode = false;
         }
     }
 
