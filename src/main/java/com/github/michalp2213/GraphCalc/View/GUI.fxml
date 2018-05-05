@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.text.Text?>
+
+<AnchorPane fx:id="mainFrame"
+          xmlns="http://javafx.com/javafx"
+          xmlns:fx="http://javafx.com/fxml"
+          fx:controller="com.github.michalp2213.GraphCalc.Controller.GUIController"
+          minWidth="800"
+          maxWidth="Infinity"
+          minHeight="600"
+          maxHeight="Infinity">
+    <VBox fx:id="leftSideButtons"
+          AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="70"
+          AnchorPane.topAnchor="0"
+          AnchorPane.bottomAnchor="0">
+        <Button fx:id="fileButton"
+                text="File"
+                maxWidth="70"
+                minWidth="70"
+                maxHeight="25"
+                minHeight="25"
+                onMouseEntered="#showFileMenu"
+                onMouseExited="#hideFileMenu"/>
+
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <VBox fx:id="graphOperationButtons">
+            <Button fx:id="addVerticesButton"
+                    text="Add&#13;&#10;vertices"
+                    maxWidth="70"
+                    minWidth="70"
+                    maxHeight="50"
+                    minHeight="50"
+                    onMouseClicked="#addVertices"
+                    textAlignment="CENTER"/>
+
+            <Button fx:id="addEdgesButton"
+                    text="Add&#13;&#10;edges"
+                    maxWidth="70"
+                    minWidth="70"
+                    maxHeight="50"
+                    minHeight="50"
+                    onMouseClicked="#addEdges"
+                    textAlignment="CENTER"/>
+
+            <Button fx:id="removeObjectsButton"
+                    text="Remove&#13;&#10;objects"
+                    maxWidth="70"
+                    minWidth="70"
+                    maxHeight="50"
+                    minHeight="50"
+                    onMouseClicked="#removeObjects"
+                    textAlignment="CENTER"/>
+
+        </VBox>
+
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <VBox fx:id="viewOptionButtons">
+            <Button fx:id="zoomInButton"
+                    text="Zoom in"
+                    maxWidth="70"
+                    minWidth="70"
+                    maxHeight="25"
+                    minHeight="25"/>
+
+            <Button fx:id="zoomOutButton"
+                    text="Zoom out"
+                    maxWidth="70"
+                    minWidth="70"
+                    maxHeight="25"
+                    minHeight="25"/>
+
+            <CheckBox fx:id="lockCheckBox"
+                      text="Lock"
+                      maxWidth="70"
+                      minWidth="70"
+                      maxHeight="25"
+                      minHeight="25"/>
+        </VBox>
+    </VBox>
+
+    <VBox fx:id="fileMenu"
+          AnchorPane.topAnchor="0"
+          AnchorPane.leftAnchor="70"
+          AnchorPane.rightAnchor="140"
+          minHeight="100"
+          minWidth="70"
+          maxHeight="100"
+          maxWidth="70"
+          visible="false"
+          onMouseEntered="#showFileMenu"
+          onMouseExited="#hideFileMenu">
+        <Button fx:id="newButton"
+                text="New"
+                maxWidth="70"
+                minWidth="70"
+                maxHeight="25"
+                minHeight="25"
+                onAction="#showNewMenu"/>
+
+        <Button fx:id="openButton"
+                text="Open"
+                maxWidth="70"
+                minWidth="70"
+                maxHeight="25"
+                minHeight="25"
+                onAction="#openClicked"/>
+
+        <Button fx:id="saveButton"
+                text="Save"
+                maxWidth="70"
+                minWidth="70"
+                maxHeight="25"
+                minHeight="25"
+                onAction="#saveClicked"/>
+
+        <Button fx:id="saveAsButton"
+                text="Save as..."
+                maxWidth="70"
+                minWidth="70"
+                maxHeight="25"
+                minHeight="25"
+                onAction="#saveAsClicked"/>
+    </VBox>
+
+    <Pane fx:id="workspace"
+            AnchorPane.topAnchor="0"
+            AnchorPane.leftAnchor="70"
+            AnchorPane.rightAnchor="0"
+            AnchorPane.bottomAnchor="0"
+            maxWidth="Infinity"
+            minWidth="730"
+            maxHeight="Infinity"
+            minHeight="600"
+            onMouseClicked="#workspaceClicked">
+    </Pane>
+
+
+    <GridPane fx:id="newMenu"
+              AnchorPane.leftAnchor="250"
+              AnchorPane.topAnchor="200"
+              alignment="CENTER"
+              visible="false">
+
+        <HBox GridPane.columnIndex="0"
+              GridPane.rowIndex="0"
+              spacing="10">
+            <Text>
+                Graph:
+            </Text>
+            <ComboBox fx:id="graphTypeBox"
+                      minWidth="100"/>
+        </HBox>
+        <HBox GridPane.columnIndex="1"
+              GridPane.rowIndex="0"
+              spacing="10">
+            <Text>
+                Source:
+            </Text>
+            <ComboBox fx:id="sourceTypeBox"
+                      minWidth="100"
+                      onAction="#showPath"/>
+        </HBox>
+        <Text fx:id="pathFieldTitle"
+              GridPane.columnIndex="0"
+              GridPane.rowIndex="1"
+              GridPane.valignment="CENTER"
+              GridPane.halignment="RIGHT"
+              visible="false">
+            Path:
+        </Text>
+        <TextField fx:id="pathField"
+                   GridPane.columnIndex="1"
+                   GridPane.rowIndex="1"
+                   GridPane.valignment="CENTER"
+                   GridPane.halignment="CENTER"
+                   visible="false"/>
+        <HBox GridPane.columnIndex="1"
+              GridPane.rowIndex="2"
+              alignment="CENTER_RIGHT">
+            <Button fx:id="newMenuExitButton"
+                    text="Cancel"
+                    onAction="#newMenuExit"/>
+            <Button fx:id="newMenuAcceptButton"
+                    text="Ok"
+                    onAction="#newMenuAcceptAndExit"/>
+        </HBox>
+    </GridPane>
+</AnchorPane>

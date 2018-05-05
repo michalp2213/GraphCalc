@@ -2,17 +2,25 @@ package com.github.michalp2213.GraphCalc.Model;
 
 import java.io.Serializable;
 
-/*
+/**
  * Class describing vertex.
  */
 
 public class Vertex<T> implements Serializable {
 	static final long serialVersionUID = 01L;
-
-    private final T v;
+	
+    protected final T v;
 
     public Vertex(T v) {
         this.v = v;
+    }
+
+    /**
+     * Function that will be called before removing edge from graph.
+     */
+
+    public void finishIt(){
+
     }
 
     @Override

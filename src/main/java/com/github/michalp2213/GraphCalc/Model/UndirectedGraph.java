@@ -1,17 +1,20 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 
-/*
- * Class describing undirected graph.
+/**
+ * Class describing undirected graph. Null as vertex isn't accepted.
  */
 
 public class UndirectedGraph<T> implements Graph<T> {
 	static final long serialVersionUID = 01L;
-    public HashMap<Vertex<T>, HashSet<Edge<T>>> list;
 
-    /*
+    protected HashMap<Vertex<T>, HashSet<Edge<T>>> list;
+
+    /**
      * Basic constructor.
      */
 
@@ -19,21 +22,32 @@ public class UndirectedGraph<T> implements Graph<T> {
         list = new HashMap<>();
     }
 
-    /*
+    /**
      * Copying constructor
      */
 
     public UndirectedGraph(UndirectedGraph<T> g) {
+        if (g == null) throw new NullPointerException();
         list = new HashMap<>(g.list);
+    }
+
+    /**
+     * Get read-only adjacency list that represents graph.
+     */
+
+    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList() {
+        return Collections.unmodifiableMap(list);
     }
 
     @Override
     public void addVertex(Vertex<T> v) {
+        if (v == null) throw new NullPointerException();
         list.putIfAbsent(v, new HashSet<>());
     }
 
     @Override
     public void addEdge(Edge<T> e) {
+        if (e == null) throw new NullPointerException();
         list.putIfAbsent(e.from, new HashSet<>());
         list.putIfAbsent(e.to, new HashSet<>());
         list.get(e.from).add(e);
@@ -42,18 +56,25 @@ public class UndirectedGraph<T> implements Graph<T> {
 
     @Override
     public void removeVertex(Vertex<T> v) {
+        if (v == null) throw new NullPointerException();
+        v.finishIt();
         HashSet<Edge<T>> set = list.remove(v);
-        if (v == null) return;
+        if (set == null) return;
         for (Edge<T> e : set) {
+            e.finishIt();
+            e.transpose().finishIt();
             list.get(e.to).remove(e.transpose());
         }
     }
 
     @Override
     public void removeEdge(Edge<T> e) {
+        if (e == null) throw new NullPointerException();
         HashSet<Edge<T>> set = list.get(e.from);
         if (set == null) return;
+        e.finishIt();
         set.remove(e);
+        e.transpose().finishIt();
         list.get(e.to).remove(e.transpose());
     }
 
