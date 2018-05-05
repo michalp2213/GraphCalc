@@ -1,5 +1,6 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -9,7 +10,9 @@ import java.util.Map;
  * Class describing directed graph. Null as vertex isn't accepted.
  */
 
-public class DirectedGraph<T> implements Graph<T> {
+public class DirectedGraph<T> implements Graph<T>, Serializable {
+	static final long serialVersionUID = 01L;
+
     protected HashMap<Vertex<T>, HashSet<Edge<T>>> list;
     protected HashMap<Vertex<T>, HashSet<Edge<T>>> transposedList;
 

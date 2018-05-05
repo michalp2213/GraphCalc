@@ -1,10 +1,14 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import java.io.Serializable;
+
 /**
  * Class describing vertex.
  */
 
-public class Vertex<T> {
+public class Vertex<T> implements Serializable {
+	static final long serialVersionUID = 01L;
+	
     protected final T v;
 
     public Vertex(T v) {
