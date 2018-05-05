@@ -7,24 +7,26 @@ import javafx.scene.transform.Rotate;
 
 public class DirectedLine extends Group {
     private Line line;
-    private Polygon arrow;
+    private Polygon endArrow;
+    private Polygon middleArrow;
 
-    public DirectedLine(Line line, Polygon arrow){
-        super(line, arrow);
+    public DirectedLine(Line line, Polygon endArrow, Polygon middleArrow){
+        super(line, endArrow, middleArrow);
         this.line = line;
-        this.arrow = arrow;
+        this.endArrow = endArrow;
+        this.middleArrow = middleArrow;
     }
 
     public DirectedLine(double startX, double startY, double endX, double endY){
-        this(new Line(startX, startY, endX, endY), getArrow(startX, startY, endX, endY));
+        this(new Line(startX, startY, endX, endY), getArrow(startX, startY, endX, endY), getMiddleArrow(startX, startY, endX, endY));
     }
 
     private static Polygon getArrow(double startX, double startY, double endX, double endY){
         Polygon toReturn = new Polygon();
         toReturn.getPoints().addAll(
                 endX, endY,
-                endX-8, endY+4,
-                endX-8, endY-4
+                endX-12, endY+4,
+                endX-12, endY-4
         );
         double angle = Math.toDegrees(Math.asin((endY - startY)/
                 Math.sqrt((endX-startX)*(endX-startX) + (startY-endY)*(startY-endY))));
@@ -36,14 +38,35 @@ public class DirectedLine extends Group {
         return toReturn;
     }
 
-    private void fixArrow(){
+    private static Polygon getMiddleArrow(double startX, double startY, double endX, double endY){
+        Polygon toReturn = new Polygon();
+        double middleX = (startX + endX)/2;
+        double middleY = (startY + endY)/2;
+        toReturn.getPoints().addAll(
+                middleX, middleY,
+                middleX-9, middleY+3,
+                middleX-9, middleY-3
+        );
+        double angle = Math.toDegrees(Math.asin((endY - startY)/
+                Math.sqrt((endX-startX)*(endX-startX) + (startY-endY)*(startY-endY))));
+        if (startX-endX >= 0){
+            angle = 180-angle;
+        }
+        toReturn.getTransforms().clear();
+        toReturn.getTransforms().add(new Rotate(angle, middleX, middleY));
+        return toReturn;
+    }
+
+    private void fixArrows(){
         double angle = Math.toDegrees(Math.asin((line.getEndY() - line.getStartY())/
                 Math.sqrt((line.getEndX()-line.getStartX())*(line.getEndX()-line.getStartX()) + (line.getStartY()-line.getEndY())*(line.getStartY()-line.getEndY()))));
         if (line.getStartX()-line.getEndX() >= 0){
             angle = 180-angle;
         }
-        arrow.getTransforms().clear();
-        arrow.getTransforms().add(new Rotate(angle, line.getEndX(), line.getEndY()));
+        endArrow.getTransforms().clear();
+        endArrow.getTransforms().add(new Rotate(angle, line.getEndX(), line.getEndY()));
+        middleArrow.getTransforms().clear();
+        middleArrow.getTransforms().add(new Rotate(angle, (line.getEndX() + line.getStartX())/2, (line.getStartY() + line.getEndY())/2));
     }
 
     public double getStartX(){
@@ -64,21 +87,21 @@ public class DirectedLine extends Group {
 
     public void setStartX(double value){
         line.setStartX(value);
-        fixArrow();
+        fixArrows();
     }
 
     public void setStartY(double value){
         line.setStartY(value);
-        fixArrow();
+        fixArrows();
     }
 
     public void setEndX(double value){
         line.setEndX(value);
-        fixArrow();
+        fixArrows();
     }
 
     public void setEndY(double value){
         line.setEndY(value);
-        fixArrow();
+        fixArrows();
     }
 }
