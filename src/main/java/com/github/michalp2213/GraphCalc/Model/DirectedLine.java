@@ -10,7 +10,7 @@ public class DirectedLine extends Group {
     private Polygon endArrow;
     private Polygon middleArrow;
 
-    public DirectedLine(Line line, Polygon endArrow, Polygon middleArrow){
+    private DirectedLine(Line line, Polygon endArrow, Polygon middleArrow){
         super(line, endArrow, middleArrow);
         this.line = line;
         this.endArrow = endArrow;
