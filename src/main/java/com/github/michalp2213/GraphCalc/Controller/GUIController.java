@@ -1,5 +1,8 @@
 package com.github.michalp2213.GraphCalc.Controller;
 
+import java.io.File;
+import java.io.IOException;
+
 import com.github.michalp2213.GraphCalc.Model.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,6 +18,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 
 
 public class GUIController {
@@ -43,6 +47,8 @@ public class GUIController {
     public Text pathFieldTitle;
     public Button newMenuAcceptButton;
     private Graph<Circle> graph = new UndirectedGraph<>();
+    private File file = null;
+    private FileChooser fileChooser = new FileChooser();
     private Circle c1, c2;
     private Boolean addVerticesMode = false;
     private Boolean addEdgesMode = false;
@@ -131,19 +137,33 @@ public class GUIController {
 
     @FXML
     public void openClicked(ActionEvent event) {
-        //todo
+    	file = fileChooser.showOpenDialog(((Node)event.getTarget()).getScene().getWindow());
+    	try {
+			graph = FileIO.readFromFile(file);
+		} catch (IOException e) {
+			showAlert("ERROR", "Could not open file: " + e.toString());
+		}
         hideFileMenu();
     }
 
     @FXML
     public void saveClicked(ActionEvent event) {
-        //todo
+    	if (file == null) {
+    		saveAsClicked(event);
+    	} else {
+    		try {
+    		FileIO.writeToFile(file, graph);
+    		} catch (IOException e) {
+    			showAlert("ERROR", "Could not save file: " + e.toString());
+    		}
+    	}
         hideFileMenu();
     }
 
     @FXML
     public void saveAsClicked(ActionEvent event) {
-        //todo
+    	file = fileChooser.showSaveDialog(((Node)event.getTarget()).getScene().getWindow());
+    	saveClicked(event);
         hideFileMenu();
     }
 
