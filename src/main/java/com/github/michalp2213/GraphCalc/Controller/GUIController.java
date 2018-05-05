@@ -58,6 +58,7 @@ public class GUIController {
     @FXML
     public void showFileMenu() {
         fileMenu.setVisible(true);
+        spreadVerticesEvenly();
         fileMenu.toFront();
     }
 
@@ -117,9 +118,7 @@ public class GUIController {
                 //todo
                 break;
         }
-        if (graph.getAdjacencyList().keySet().size() > 0) {
-            spreadVerticesEvenly();
-        }
+        spreadVerticesEvenly();
         newMenuExit(event);
     }
 
@@ -331,18 +330,26 @@ public class GUIController {
     }
 
     private void spreadVerticesEvenly(){
-        double midX = workspace.getWidth()/2;
-        double midY = workspace.getHeight()/2;
-        double polygonRadius = Math.min(midX/2, midY/2);
-        int k = graph.getAdjacencyList().keySet().size();
-        int j = 0;
-        for (Vertex<Circle> vT : graph.getAdjacencyList().keySet()){
-            CircleVertex v = (CircleVertex) vT;
-            double arg = (2*j*Math.PI)/k;
-            double toX = Math.cos(arg)*polygonRadius + midX;
-            double toY = Math.sin(arg)*polygonRadius + midY;
-            moveVertex(v, toX, toY);
-            j++;
+        if (graph.getAdjacencyList().keySet().size() != 0) {
+            double midX = workspace.getWidth() / 2;
+            double midY = workspace.getHeight() / 2;
+            if (graph.getAdjacencyList().keySet().size() == 1){
+                CircleVertex v = (CircleVertex) graph.getAdjacencyList().keySet().iterator().next();
+                moveVertex(v, midX, midY);
+            }
+            else {
+                double polygonRadius = Math.min(midX / 2, midY / 2);
+                int k = graph.getAdjacencyList().keySet().size();
+                int j = 0;
+                for (Vertex<Circle> vT : graph.getAdjacencyList().keySet()) {
+                    CircleVertex v = (CircleVertex) vT;
+                    double arg = (2 * j * Math.PI) / k;
+                    double toX = Math.cos(arg) * polygonRadius + midX;
+                    double toY = Math.sin(arg) * polygonRadius + midY;
+                    moveVertex(v, toX, toY);
+                    j++;
+                }
+            }
         }
     }
 }
