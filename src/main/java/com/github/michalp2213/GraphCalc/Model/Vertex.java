@@ -1,5 +1,7 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import javafx.scene.shape.Circle;
+
 import java.io.Serializable;
 
 /**
@@ -28,6 +30,10 @@ public class Vertex<T> implements Serializable {
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Vertex)) return false;
+        if (((Vertex) obj).v instanceof Circle && v instanceof Circle) { //temporary workaround
+            return ((Circle)((Vertex) obj).v).getCenterX() == ((Circle)v).getCenterX() &&
+                    ((Circle)((Vertex) obj).v).getCenterY() == ((Circle) v).getCenterY();
+        }
         return ((Vertex) obj).v.equals(v);
     }
 

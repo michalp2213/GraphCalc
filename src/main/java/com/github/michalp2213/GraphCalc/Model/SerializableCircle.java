@@ -24,4 +24,17 @@ public class SerializableCircle implements Serializable {
 	public Circle getCircle () {
 		return new Circle(x,  y,  radius);
 	}
+
+	@Override
+	public boolean equals(Object o) {
+	    if (o instanceof SerializableCircle) {
+	        return (x == ((SerializableCircle) o).x) && (y == ((SerializableCircle) o).y);
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode () {
+	    return (int) (x + 37*y);
+    }
 }

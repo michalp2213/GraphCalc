@@ -141,6 +141,8 @@ public class GUIController {
     @FXML
     public void openClicked(ActionEvent event) {
     	file = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
+    	if (file == null)
+    	    return;
     	try {
 			Graph <SerializableCircle> tmp = FileIO.readFromFile(file, workspace);
 
@@ -172,13 +174,19 @@ public class GUIController {
 				for (Object x : (HashSet) neigh) {
 					Edge <SerializableCircle> e = (Edge<SerializableCircle>) x;
 					
-					SerializableCircleVertex v = ((SerializableCircleVertex) e.from);
-					SerializableCircleVertex u = ((SerializableCircleVertex) e.to);
-					
-					c1 = v.getCircleVertex(workspace).getLabel();
-					c2 = u.getCircleVertex(workspace).getLabel();
-					
-					graph.addEdge(new LineEdge(v.getCircleVertex(workspace), u.getCircleVertex(workspace), getLine(c1, c2), workspace));
+					CircleVertex v = ((SerializableCircleVertex) e.from).getCircleVertex(workspace);
+					CircleVertex u = ((SerializableCircleVertex) e.to).getCircleVertex(workspace);
+
+					c1 = v.getLabel();
+					c2 = u.getLabel();
+
+					Node l = getLine(c1, c2);
+
+                    if (graph.containsEdge(new LineEdge(v, u, l, workspace)))
+                        continue;
+
+					graph.addEdge(new LineEdge(v, u, l, workspace));
+					l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, c1, c2));
 
 					c1 = null;
 					c2 = null;
@@ -187,7 +195,7 @@ public class GUIController {
 		} catch (IOException e) {
 			showAlert("ERROR", "Could not open file: " + e.toString());
 		}
-    	
+
         hideFileMenu();
     }
 
@@ -208,6 +216,8 @@ public class GUIController {
     @FXML
     public void saveAsClicked(ActionEvent event) {
     	file = fileChooser.showSaveDialog(mainFrame.getScene().getWindow());
+    	if (file == null)
+    	    return;
     	saveClicked(event);
 
         hideFileMenu();
@@ -233,6 +243,8 @@ public class GUIController {
 
     @FXML
     public void removeObjects(MouseEvent mouseEvent) {
+        //saveClicked(new ActionEvent());
+        openClicked(new ActionEvent());
         changeMode(removeObjectsMode, removeObjectsButton);
         removeObjectsMode = !removeObjectsMode;
         if (removeObjectsMode) {
@@ -415,7 +427,7 @@ public class GUIController {
                 } else if (c2 == null) {
                     c2 = c;
                     Node l = getLine(c1, c2);
-                    Circle a = c1, b = c2;
+
                     l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, c1, c2));
                     try {
                         if (!graph.containsEdge(new LineEdge(new CircleVertex(c1, workspace),
