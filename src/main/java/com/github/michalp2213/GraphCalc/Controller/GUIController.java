@@ -162,6 +162,9 @@ public class GUIController {
 			
 			for (Object v : tmp.getAdjacencyList().keySet()) {
 				Circle c = ((SerializableCircleVertex) v).getCircleVertex(workspace).getLabel();
+
+                graph.addVertex(new CircleVertex(c, workspace));
+
 				EventHandler<MouseEvent> vertexClicked = e -> {
                 if (removeObjectsMode) {
                     graph.removeVertex(new CircleVertex(c, workspace));
@@ -198,7 +201,6 @@ public class GUIController {
                 	}
 				};
             	c.addEventFilter(MouseEvent.MOUSE_CLICKED, vertexClicked);
-            	graph.addVertex(((SerializableCircleVertex) v).getCircleVertex(workspace));
 			}
 
 			for (Object neigh : tmp.getAdjacencyList().values()) {
@@ -212,6 +214,9 @@ public class GUIController {
 					c2 = u.getCircleVertex(workspace).getLabel();
 					
 					graph.addEdge(new LineEdge(v.getCircleVertex(workspace), u.getCircleVertex(workspace), getLine(c1, c2), workspace));
+
+					c1 = null;
+					c2 = null;
 				}
 			}
 		} catch (IOException e) {
