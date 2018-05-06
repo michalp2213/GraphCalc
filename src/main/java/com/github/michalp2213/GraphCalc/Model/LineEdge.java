@@ -1,5 +1,6 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Circle;
 
@@ -30,5 +31,9 @@ public class LineEdge extends Edge<Circle> {
     @Override
     public void finishIt() {
         parent.getChildren().remove(line);
+    }
+    
+    public void draw() {
+    	parent.getChildren().add((Node)line);
     }
 }

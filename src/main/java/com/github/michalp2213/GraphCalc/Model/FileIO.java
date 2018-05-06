@@ -7,12 +7,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
+import javafx.scene.layout.Pane;
+
 public class FileIO {
-	public static <T> Graph <T> readFromFile(File file) throws IOException {
+	
+	public static Graph<SerializableCircle> readFromFile(File file, Pane workspace) throws IOException {
 		if (file == null)
 			return null;
 		
-		Graph <T> ret = null;
+		Graph<SerializableCircle> ret = null;
 		
 		ObjectInputStream input = null;
 		try {
@@ -20,9 +23,8 @@ public class FileIO {
 			
 			Object tmp = input.readObject();
 			
-			//TODO: figure out a check if read Graph really stores T
 			if (tmp instanceof Graph) {
-				ret = (Graph <T>) tmp;
+				ret = (Graph <SerializableCircle>) tmp;
 			}
 		} catch (ClassNotFoundException e) {
 			throw new IOException(e);
@@ -39,7 +41,7 @@ public class FileIO {
 		return ret;
 	}
 	
-	public static <T> void writeToFile(File file, Graph <T> data) throws IOException {
+	public static void writeToFile(File file, SavableCircleGraph data) throws IOException {
 		if (file == null || data == null)
 			return;
 		
@@ -47,7 +49,7 @@ public class FileIO {
 		try {
 			output = new ObjectOutputStream(new FileOutputStream(file));
 			
-			output.writeObject(data);
+			output.writeObject(data.getSerializable());
 		} finally {
 			if (output != null)
 				output.close();

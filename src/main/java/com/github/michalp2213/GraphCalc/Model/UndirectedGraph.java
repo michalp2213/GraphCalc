@@ -10,8 +10,6 @@ import java.util.Map;
  */
 
 public class UndirectedGraph<T> implements Graph<T> {
-	static final long serialVersionUID = 01L;
-
     protected HashMap<Vertex<T>, HashSet<Edge<T>>> list;
 
     /**

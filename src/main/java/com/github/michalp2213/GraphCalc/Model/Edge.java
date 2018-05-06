@@ -1,6 +1,5 @@
 package com.github.michalp2213.GraphCalc.Model;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -8,9 +7,7 @@ import java.util.Objects;
  * Class describing edge.
  */
 
-public class Edge<T> implements Serializable {
-	static final long serialVersionUID = 01L;
-	
+public class Edge<T> {
     public final Vertex<T> from;
     public final Vertex<T> to;
     protected HashMap<Class, Object> attributes;

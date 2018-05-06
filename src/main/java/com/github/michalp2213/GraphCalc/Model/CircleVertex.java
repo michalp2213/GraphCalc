@@ -15,4 +15,12 @@ public class CircleVertex extends Vertex<Circle> {
     public void finishIt(){
         parent.getChildren().remove(v);
     }
+    
+    public SerializableCircleVertex getSerializableVertex() {
+    	return new SerializableCircleVertex(new SerializableCircle(v));
+    }
+    
+    public void draw() {
+    	parent.getChildren().add(v);
+    }
 }

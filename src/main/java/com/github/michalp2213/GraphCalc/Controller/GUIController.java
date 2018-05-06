@@ -2,8 +2,11 @@ package com.github.michalp2213.GraphCalc.Controller;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 
 import com.github.michalp2213.GraphCalc.Model.*;
+import com.github.michalp2213.GraphCalc.Model.SavableCircleGraph.Type;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -46,7 +49,7 @@ public class GUIController {
     public Button newMenuExitButton;
     public Text pathFieldTitle;
     public Button newMenuAcceptButton;
-    private Graph<Circle> graph = new UndirectedGraph<>();
+    private SavableCircleGraph graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
     private File file = null;
     private FileChooser fileChooser = new FileChooser();
     private Circle c1, c2;
@@ -97,13 +100,13 @@ public class GUIController {
     public void newMenuAcceptAndExit(ActionEvent event) {
         switch (graphTypeBox.getSelectionModel().getSelectedItem()) {
             case "Undirected":
-                graph = new UndirectedGraph<>();
+                graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
                 break;
             case "Directed":
-                graph = new DirectedGraph<>();
+                graph = new SavableCircleGraph(SavableCircleGraph.Type.DIRECTED);
                 break;
             case "Poset":
-                graph = new Poset<>();
+                graph = new SavableCircleGraph(SavableCircleGraph.Type.POSET);
                 break;
         }
         workspace.getChildren().clear();
@@ -137,9 +140,35 @@ public class GUIController {
 
     @FXML
     public void openClicked(ActionEvent event) {
-    	file = fileChooser.showOpenDialog(((Node)event.getTarget()).getScene().getWindow());
+    	file = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
     	try {
-			graph = FileIO.readFromFile(file);
+			Graph <SerializableCircle> tmp = FileIO.readFromFile(file, workspace);
+			
+			if (tmp instanceof UndirectedGraph) {
+				graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
+			} else if (tmp instanceof Poset) {
+				graph = new SavableCircleGraph(SavableCircleGraph.Type.POSET);
+			} else if (tmp instanceof DirectedGraph) {
+				graph = new SavableCircleGraph(SavableCircleGraph.Type.DIRECTED);
+			}
+			
+			for (Object v : tmp.getAdjacencyList().keySet()) {
+				graph.addVertex(((SerializableCircleVertex) v).getCircleVertex(workspace));
+			}
+
+			for (Object neigh : tmp.getAdjacencyList().entrySet()) {
+				for (Object x : (HashSet) neigh) {
+					Edge <SerializableCircle> e = (Edge<SerializableCircle>) x;
+					
+					SerializableCircleVertex v = ((SerializableCircleVertex) e.from);
+					SerializableCircleVertex u = ((SerializableCircleVertex) e.to);
+					
+					c1 = v.getCircleVertex(workspace).getLabel();
+					c2 = u.getCircleVertex(workspace).getLabel();
+					
+					graph.addEdge(new LineEdge(v.getCircleVertex(workspace), u.getCircleVertex(workspace), (Object) getLine(), workspace));
+				}
+			}
 		} catch (IOException e) {
 			showAlert("ERROR", "Could not open file: " + e.toString());
 		}
@@ -162,7 +191,7 @@ public class GUIController {
 
     @FXML
     public void saveAsClicked(ActionEvent event) {
-    	file = fileChooser.showSaveDialog(((Node)event.getTarget()).getScene().getWindow());
+    	file = fileChooser.showSaveDialog(mainFrame.getScene().getWindow());
     	saveClicked(event);
         hideFileMenu();
     }
@@ -198,7 +227,7 @@ public class GUIController {
     public void workspaceClicked(MouseEvent mouseEvent) {
         if (addVerticesMode) {
             Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
-            workspace.getChildren().add(c);
+
             graph.addVertex(new CircleVertex(c, workspace));
             EventHandler<MouseEvent> vertexClicked = e -> {
                 if (removeObjectsMode) {
@@ -223,7 +252,6 @@ public class GUIController {
                                     new CircleVertex(c2, workspace), l, workspace))) {
                                 graph.addEdge(new LineEdge(new CircleVertex(c1, workspace),
                                         new CircleVertex(c2, workspace), l, workspace));
-                                workspace.getChildren().add(l);
                             }
                         } catch (IllegalArgumentException exception) {
                             showAlert("Wrong edge", "This edge cannot be inserted into poset.");
