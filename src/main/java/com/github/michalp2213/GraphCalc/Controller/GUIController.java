@@ -83,7 +83,8 @@ public class GUIController {
         if (sourceTypeBox.getItems().isEmpty()) {
             sourceTypeBox.getItems().addAll("Clear",
                     "Adjacency lists",
-                    "Adjacency matrix");
+                    "Adjacency matrix",
+                    "Edge list");
         }
         graphTypeBox.getSelectionModel().selectFirst();
         sourceTypeBox.getSelectionModel().selectFirst();
@@ -121,6 +122,9 @@ public class GUIController {
                 break;
             case "Adjacency matrix":
                 graphFromMatrix(pathField.getText());
+                break;
+            case "Edge list":
+                //todo
                 break;
         }
         spreadVerticesEvenly();
