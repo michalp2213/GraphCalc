@@ -154,7 +154,7 @@ public class GUIController {
 				graph.addVertex(((SerializableCircleVertex) v).getCircleVertex(workspace));
 			}
 
-			for (Object neigh : tmp.getAdjacencyList().entrySet()) {
+			for (Object neigh : tmp.getAdjacencyList().values()) {
 				for (Object x : (HashSet) neigh) {
 					Edge <SerializableCircle> e = (Edge<SerializableCircle>) x;
 					
@@ -312,7 +312,7 @@ public class GUIController {
             endX = midX + distFromMid * unitVecX;
             endY = midY + distFromMid * unitVecY;
         }
-        if (graph.getClass().equals(UndirectedGraph.class)) {
+        if (graph.getType() == SavableCircleGraph.Type.UNDIRECTED) {
             line = new Line(startX, startY, endX, endY);
         } else {
             line = new DirectedLine(startX, startY, endX, endY);

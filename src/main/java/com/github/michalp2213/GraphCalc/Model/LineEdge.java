@@ -34,6 +34,6 @@ public class LineEdge extends Edge<Circle> {
     }
     
     public void draw() {
-    	parent.getChildren().add((Node)line);
+    	parent.getChildren().add(line);
     }
 }
