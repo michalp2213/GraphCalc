@@ -92,7 +92,7 @@ public class GUIController {
 
     @FXML
     public void newMenuExit(ActionEvent event) {
-        //todo
+        changeMode(true, true, true);
         graphTypeBox.getSelectionModel().clearSelection();
         sourceTypeBox.getSelectionModel().clearSelection();
         hidePath(event);
@@ -463,9 +463,12 @@ public class GUIController {
                     }
                 }
             }
-            sc.close();
         } catch (FileNotFoundException e) {
             showAlert("File not found","Please provide existing file");
+        } catch (Exception e){
+            showAlert("Something has gone wrong", "Data representing graph was in wrong format");
+            workspace.getChildren().clear();
+            graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
         }
     }
 
@@ -497,6 +500,10 @@ public class GUIController {
             }
         } catch (FileNotFoundException e) {
             showAlert("File not found","Please provide existing file");
+        } catch (Exception e){
+            showAlert("Something has gone wrong", "Data representing graph was in wrong format");
+            workspace.getChildren().clear();
+            graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
         }
     }
 }
