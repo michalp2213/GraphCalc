@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.HashSet;
 
 import com.github.michalp2213.GraphCalc.Model.*;
-import com.github.michalp2213.GraphCalc.Model.SavableCircleGraph.Type;
 
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -151,7 +150,44 @@ public class GUIController {
 			}
 			
 			for (Object v : tmp.getAdjacencyList().keySet()) {
-				graph.addVertex(((SerializableCircleVertex) v).getCircleVertex(workspace));
+				Circle c = ((SerializableCircleVertex) v).getCircleVertex(workspace).getLabel();
+				EventHandler<MouseEvent> vertexClicked = e -> {
+                if (removeObjectsMode) {
+                    graph.removeVertex(new CircleVertex(c, workspace));
+                } else if (addEdgesMode) {
+                    if (c1 == null) {
+                        c1 = c;
+                        c.setFill(Color.RED);
+                    } else if (c2 == null) {
+                        c2 = c;
+                        Node l = getLine(c1, c2);
+                        Circle a = c1, b = c2;
+                        EventHandler<MouseEvent> edgeClicked = ev -> {
+                            if (removeObjectsMode) {
+                                graph.removeEdge(new LineEdge(new CircleVertex(a, workspace),
+                                        new CircleVertex(b, workspace), l, workspace));
+                            }
+                        };
+                        l.addEventFilter(MouseEvent.MOUSE_CLICKED, edgeClicked);
+                        	try {
+                        		if (!graph.containsEdge(new LineEdge(new CircleVertex(c1, workspace),
+                                    new CircleVertex(c2, workspace), l, workspace))) {
+                        				graph.addEdge(new LineEdge(new CircleVertex(c1, workspace),
+                                        new CircleVertex(c2, workspace), l, workspace));
+                            	}
+                        	} catch (IllegalArgumentException exception) {
+                            	showAlert("Wrong edge", "This edge cannot be inserted into poset.");
+                        	}
+                        	c1.setFill(Color.BLACK);
+                        	c1.toFront();
+                        	c2.toFront();
+                        	c1 = null;
+                        	c2 = null;
+                    	}
+                	}
+				};
+            	c.addEventFilter(MouseEvent.MOUSE_CLICKED, vertexClicked);
+            	graph.addVertex(((SerializableCircleVertex) v).getCircleVertex(workspace));
 			}
 
 			for (Object neigh : tmp.getAdjacencyList().values()) {
