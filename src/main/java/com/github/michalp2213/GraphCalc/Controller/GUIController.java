@@ -13,10 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -47,9 +44,13 @@ public class GUIController {
     public ComboBox<String> sourceTypeBox;
     public TextField pathField;
     public Button newMenuExitButton;
-    public Text pathFieldTitle;
     public Button newMenuAcceptButton;
     private SavableCircleGraph graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
+    public Button spreadVerticesButton;
+    public HBox newMenuPath;
+    public Label graphLabel;
+    public Label sourceLabel;
+    public Label pathLabel;
     private File file = null;
     private FileChooser fileChooser = new FileChooser();
     private Circle c1, c2;
@@ -120,22 +121,19 @@ public class GUIController {
                 //todo
                 break;
         }
-
+        spreadVerticesEvenly();
         newMenuExit(event);
     }
 
     @FXML
     public void showPath(ActionEvent event) {
-        pathField.setVisible(!(sourceTypeBox.getSelectionModel().getSelectedItem() != null &&
-                sourceTypeBox.getSelectionModel().getSelectedItem().equals("Clear")));
-        pathFieldTitle.setVisible(!(sourceTypeBox.getSelectionModel().getSelectedItem() != null &&
+        newMenuPath.setVisible(!(sourceTypeBox.getSelectionModel().getSelectedItem() != null &&
                 sourceTypeBox.getSelectionModel().getSelectedItem().equals("Clear")));
     }
 
     @FXML
     public void hidePath(ActionEvent even) {
-        pathFieldTitle.setVisible(false);
-        pathField.setVisible(false);
+        newMenuPath.setVisible(false);
     }
 
     @FXML
@@ -166,26 +164,27 @@ public class GUIController {
 					c1 = v.getCircleVertex(workspace).getLabel();
 					c2 = u.getCircleVertex(workspace).getLabel();
 					
-					graph.addEdge(new LineEdge(v.getCircleVertex(workspace), u.getCircleVertex(workspace), (Object) getLine(), workspace));
+					graph.addEdge(new LineEdge(v.getCircleVertex(workspace), u.getCircleVertex(workspace), getLine(c1, c2), workspace));
 				}
 			}
 		} catch (IOException e) {
 			showAlert("ERROR", "Could not open file: " + e.toString());
 		}
+    	
         hideFileMenu();
     }
 
     @FXML
     public void saveClicked(ActionEvent event) {
-    	if (file == null) {
-    		saveAsClicked(event);
-    	} else {
-    		try {
-    		FileIO.writeToFile(file, graph);
-    		} catch (IOException e) {
-    			showAlert("ERROR", "Could not save file: " + e.toString());
-    		}
-    	}
+        if (file == null) {
+            saveAsClicked(event);
+        } else {
+            try {
+                FileIO.writeToFile(file, graph);
+            } catch (IOException e) {
+                showAlert("ERROR", "Could not save file: " + e.toString());
+            }
+        }
         hideFileMenu();
     }
 
@@ -193,6 +192,7 @@ public class GUIController {
     public void saveAsClicked(ActionEvent event) {
     	file = fileChooser.showSaveDialog(mainFrame.getScene().getWindow());
     	saveClicked(event);
+
         hideFileMenu();
     }
 
@@ -224,6 +224,11 @@ public class GUIController {
     }
 
     @FXML
+    public void spreadVerticesPressed(MouseEvent event) {
+        spreadVerticesEvenly();
+    }
+
+    @FXML
     public void workspaceClicked(MouseEvent mouseEvent) {
         if (addVerticesMode) {
             Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
@@ -238,7 +243,7 @@ public class GUIController {
                         c.setFill(Color.RED);
                     } else if (c2 == null) {
                         c2 = c;
-                        Node l = getLine();
+                        Node l = getLine(c1, c2);
                         Circle a = c1, b = c2;
                         EventHandler<MouseEvent> edgeClicked = event -> {
                             if (removeObjectsMode) {
@@ -291,12 +296,26 @@ public class GUIController {
         }
     }
 
-    private Node getLine() {
+    private Node getLine(Circle a, Circle b) {
         Node line;
+        double startX = a.getCenterX(), startY = a.getCenterY(), endX = b.getCenterX(), endY = b.getCenterY();
+        double vecLength = Math.sqrt((a.getCenterX() + b.getCenterX()) * (a.getCenterX() + b.getCenterX()) +
+                (a.getCenterY() + b.getCenterY()) * (a.getCenterY() + b.getCenterY()));
+        if (vecLength != 0) {
+            double unitVecX = (b.getCenterX() - a.getCenterX()) / vecLength;
+            double unitVecY = (b.getCenterY() - a.getCenterY()) / vecLength;
+            double midX = (a.getCenterX() + b.getCenterX()) / 2;
+            double midY = (a.getCenterY() + b.getCenterY()) / 2;
+            double distFromMid = vecLength / 2 - RADIUS;
+            startX = midX - distFromMid * unitVecX;
+            startY = midY - distFromMid * unitVecY;
+            endX = midX + distFromMid * unitVecX;
+            endY = midY + distFromMid * unitVecY;
+        }
         if (graph.getClass().equals(UndirectedGraph.class)) {
-            line = new Line(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
+            line = new Line(startX, startY, endX, endY);
         } else {
-            line = new DirectedLine(c1.getCenterX(), c1.getCenterY(), c2.getCenterX(), c2.getCenterY());
+            line = new DirectedLine(startX, startY, endX, endY);
         }
         return line;
     }
@@ -306,5 +325,93 @@ public class GUIController {
         alert.setHeaderText(message);
         alert.setContentText(message2);
         alert.showAndWait();
+    }
+
+    private void moveVertex(CircleVertex v, double toX, double toY) {
+        Circle c = new Circle(toX, toY, RADIUS);
+        for (Edge<Circle> e : graph.getAdjacencyList().get(v)) {
+            LineEdge le = (LineEdge) e;
+            if (graph.getClass().equals(UndirectedGraph.class)) {
+                Line l = (Line) le.line;
+                Line temp;
+                if (le.to.equals(v)) {
+                    if (le.from.equals(v)){
+                        temp = (Line) getLine(c, c);
+                    }
+                    else {
+                        temp = (Line) getLine(le.from.getLabel(), c);
+                    }
+                } else {
+                    temp = (Line) getLine(c, le.to.getLabel());
+                }
+                l.setStartX(temp.getStartX());
+                l.setStartY(temp.getStartY());
+                l.setEndX(temp.getEndX());
+                l.setEndY(temp.getEndY());
+            } else {
+                DirectedLine l = (DirectedLine) le.line;
+                DirectedLine temp;
+                if (le.to.equals(v)) {
+                    if (le.from.equals(v)){
+                        temp = (DirectedLine) getLine(c, c);
+                    }
+                    else {
+                        temp = (DirectedLine) getLine(le.from.getLabel(), c);
+                    }
+                } else {
+                    temp = (DirectedLine) getLine(c, le.to.getLabel());
+                }
+                l.setStartX(temp.getStartX());
+                l.setStartY(temp.getStartY());
+                l.setEndX(temp.getEndX());
+                l.setEndY(temp.getEndY());
+            }
+        }
+        if (graph.getType() == SavableCircleGraph.Type.DIRECTED) {
+            for (Edge<Circle> e : graph.getTransposedAdjacencyList().get(v)) {
+                LineEdge le = (LineEdge) e;
+                DirectedLine l = (DirectedLine) le.line;
+                DirectedLine temp;
+                if (le.to.equals(v)) {
+                    if (le.from.equals(v)){
+                        temp = (DirectedLine) getLine(c, c);
+                    }
+                    else {
+                        temp = (DirectedLine) getLine(c, le.from.getLabel());
+                    }
+                } else {
+                    temp = (DirectedLine) getLine(le.to.getLabel(), c);
+                }
+                l.setStartX(temp.getStartX());
+                l.setStartY(temp.getStartY());
+                l.setEndX(temp.getEndX());
+                l.setEndY(temp.getEndY());
+            }
+        }
+        v.getLabel().setCenterX(toX);
+        v.getLabel().setCenterY(toY);
+    }
+
+    private void spreadVerticesEvenly() {
+        if (graph.getAdjacencyList().keySet().size() != 0) {
+            double midX = workspace.getWidth() / 2;
+            double midY = workspace.getHeight() / 2;
+            if (graph.getAdjacencyList().keySet().size() == 1) {
+                CircleVertex v = (CircleVertex) graph.getAdjacencyList().keySet().iterator().next();
+                moveVertex(v, midX, midY);
+            } else {
+                double polygonRadius = Math.min(2 * midX / 3, 2 * midY / 3);
+                int k = graph.getAdjacencyList().keySet().size();
+                int j = 0;
+                for (Vertex<Circle> vT : graph.getAdjacencyList().keySet()) {
+                    CircleVertex v = (CircleVertex) vT;
+                    double arg = (2 * j * Math.PI) / k;
+                    double toX = Math.cos(arg) * polygonRadius + midX;
+                    double toY = Math.sin(arg) * polygonRadius + midY;
+                    moveVertex(v, toX, toY);
+                    j++;
+                }
+            }
+        }
     }
 }

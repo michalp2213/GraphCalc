@@ -10,19 +10,25 @@ public class SavableCircleGraph implements Graph<Circle> {
 	private Graph<Circle> drawable;
 	private Graph<SerializableCircle> savable;
 	
+	private Type type;
+	
 	public SavableCircleGraph (Type t) {
 		switch (t) {
 			case DIRECTED:
 				drawable = new DirectedGraph<>();
 				savable = new DirectedGraph<>();
+				type = Type.DIRECTED;
 				break;
 			case UNDIRECTED:
 				drawable = new UndirectedGraph<>();
 				savable = new UndirectedGraph<>();
+				type = Type.UNDIRECTED;
 				break;
 			case POSET:
 				drawable = new Poset<>();
 				savable = new Poset<>();
+				type = Type.POSET;
+				break;
 		}
 	}
 	
@@ -85,5 +91,14 @@ public class SavableCircleGraph implements Graph<Circle> {
 
 	public static enum Type {
 		DIRECTED, UNDIRECTED, POSET;
+	}
+
+	@Override
+	public Map<? extends Vertex<Circle>, ? extends HashSet<Edge<Circle>>> getTransposedAdjacencyList() {
+		return drawable.getTransposedAdjacencyList();
+	}
+	
+	public Type getType() {
+		return type;
 	}
 }

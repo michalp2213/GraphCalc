@@ -1,9 +1,6 @@
 package com.github.michalp2213.GraphCalc.Model;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class describing undirected graph. Null as vertex isn't accepted.
@@ -34,6 +31,10 @@ public class UndirectedGraph<T> implements Graph<T> {
      */
 
     public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList() {
+        return Collections.unmodifiableMap(list);
+    }
+
+    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getTransposedAdjacencyList() {
         return Collections.unmodifiableMap(list);
     }
 

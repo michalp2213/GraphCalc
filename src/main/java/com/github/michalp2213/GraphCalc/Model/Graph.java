@@ -7,7 +7,15 @@ import java.util.Map;
  * Graph interface describing basic operations on graph.
  */
 
+import java.util.HashSet;
+import java.util.Map;
+
 public interface Graph<T> {
+
+    Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList();
+
+    Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getTransposedAdjacencyList();
+
     void addVertex(Vertex<T> v);
 
     void addEdge(Edge<T> e);
@@ -19,6 +27,4 @@ public interface Graph<T> {
     boolean containsVertex(Vertex<T> v);
 
     boolean containsEdge(Edge<T> e);
-
-    Map <? extends Vertex <T>, ? extends HashSet<Edge <T>>> getAdjacencyList();
 }

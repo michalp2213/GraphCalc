@@ -10,7 +10,7 @@ public class DirectedLine extends Group {
     private Polygon endArrow;
     private Polygon middleArrow;
 
-    public DirectedLine(Line line, Polygon endArrow, Polygon middleArrow){
+    private DirectedLine(Line line, Polygon endArrow, Polygon middleArrow){
         super(line, endArrow, middleArrow);
         this.line = line;
         this.endArrow = endArrow;
@@ -65,7 +65,21 @@ public class DirectedLine extends Group {
         }
         endArrow.getTransforms().clear();
         endArrow.getTransforms().add(new Rotate(angle, line.getEndX(), line.getEndY()));
+        endArrow.getPoints().clear();
+        endArrow.getPoints().addAll(
+                line.getEndX(), line.getEndY(),
+                line.getEndX()-12, line.getEndY()+4,
+                line.getEndX()-12, line.getEndY()-4
+        );
         middleArrow.getTransforms().clear();
+        middleArrow.getPoints().clear();
+        double middleX = (line.getStartX() + line.getEndX())/2;
+        double middleY = (line.getStartY() + line.getEndY())/2;
+        middleArrow.getPoints().addAll(
+                middleX, middleY,
+                middleX-9, middleY+3,
+                middleX-9, middleY-3
+        );
         middleArrow.getTransforms().add(new Rotate(angle, (line.getEndX() + line.getStartX())/2, (line.getStartY() + line.getEndY())/2));
     }
 

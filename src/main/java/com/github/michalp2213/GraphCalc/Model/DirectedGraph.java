@@ -1,9 +1,6 @@
 package com.github.michalp2213.GraphCalc.Model;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Class describing directed graph. Null as vertex isn't accepted.
@@ -39,6 +36,14 @@ public class DirectedGraph<T> implements Graph<T> {
     @Override
     public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList() {
         return Collections.unmodifiableMap(list);
+    }
+
+    /**
+     * Get read-only transposed adjacency list that represents graph.
+     */
+
+    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getTransposedAdjacencyList() {
+        return Collections.unmodifiableMap(transposedList);
     }
 
     /**
