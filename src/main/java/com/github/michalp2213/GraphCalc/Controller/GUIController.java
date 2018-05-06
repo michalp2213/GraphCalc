@@ -142,11 +142,11 @@ public class GUIController {
     	try {
 			Graph <SerializableCircle> tmp = FileIO.readFromFile(file, workspace);
 
-            for (Object v : ((Graph) tmp).getAdjacencyList().keySet()) {
+            for (Object v : ((Graph) graph).getAdjacencyList().keySet()) {
                 ((CircleVertex) v).finishIt();
             }
 
-            for (Object neigh : ((Graph) tmp).getAdjacencyList().values()) {
+            for (Object neigh : ((Graph) graph).getAdjacencyList().values()) {
                 for (Object e : (HashSet) neigh) {
                     ((LineEdge) e).finishIt();
                 }
