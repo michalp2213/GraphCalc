@@ -245,8 +245,6 @@ public class GUIController {
 
     @FXML
     public void removeObjects(MouseEvent mouseEvent) {
-        //saveClicked(new ActionEvent());
-        openClicked(new ActionEvent());
         changeMode(removeObjectsMode, removeObjectsButton);
         removeObjectsMode = !removeObjectsMode;
         if (removeObjectsMode) {
