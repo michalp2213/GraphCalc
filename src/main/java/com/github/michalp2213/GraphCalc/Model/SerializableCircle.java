@@ -2,7 +2,9 @@ package com.github.michalp2213.GraphCalc.Model;
 
 import javafx.scene.shape.Circle;
 
-public class SerializableCircle {
+import java.io.Serializable;
+
+public class SerializableCircle implements Serializable {
 	private double x;
 	private double y;
 	private double radius;

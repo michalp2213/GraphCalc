@@ -1,12 +1,13 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import java.io.Serializable;
 import java.util.*;
 
 /**
  * Class describing directed graph. Null as vertex isn't accepted.
  */
 
-public class DirectedGraph<T> implements Graph<T> {
+public class DirectedGraph<T> implements Graph<T>, Serializable {
     protected HashMap<Vertex<T>, HashSet<Edge<T>>> list;
     protected HashMap<Vertex<T>, HashSet<Edge<T>>> transposedList;
 
