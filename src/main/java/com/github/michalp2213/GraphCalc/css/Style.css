@@ -1,0 +1,29 @@
+.actionButton {
+    -fx-background-color:darkgray;
+}
+
+#leftSideButtons {
+    -fx-background-color:lightgray;
+}
+
+#newMenu {
+    -fx-background-color:lightgray;
+    -fx-border-style:solid;
+    -fx-padding: 5px 5px 5px 5px;
+}
+
+#graphLabel {
+    -fx-padding: 3px -6px 0px 2px;
+}
+
+#sourceLabel {
+    -fx-padding: 3px -6px 0px 4px;
+}
+
+#pathLabel {
+    -fx-padding: 3px 3px 0px 2px;
+}
+
+#newMenuPath {
+    -fx-padding: 4px 4px 4px 4px;
+}

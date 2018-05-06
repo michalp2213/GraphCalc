@@ -10,10 +10,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -44,9 +41,12 @@ public class GUIController {
     public ComboBox<String> sourceTypeBox;
     public TextField pathField;
     public Button newMenuExitButton;
-    public Text pathFieldTitle;
     public Button newMenuAcceptButton;
     public Button spreadVerticesButton;
+    public HBox newMenuPath;
+    public Label graphLabel;
+    public Label sourceLabel;
+    public Label pathLabel;
     private Graph<Circle> graph = new UndirectedGraph<>();
     private File file = null;
     private FileChooser fileChooser = new FileChooser();
@@ -124,16 +124,13 @@ public class GUIController {
 
     @FXML
     public void showPath(ActionEvent event) {
-        pathField.setVisible(!(sourceTypeBox.getSelectionModel().getSelectedItem() != null &&
-                sourceTypeBox.getSelectionModel().getSelectedItem().equals("Clear")));
-        pathFieldTitle.setVisible(!(sourceTypeBox.getSelectionModel().getSelectedItem() != null &&
+        newMenuPath.setVisible(!(sourceTypeBox.getSelectionModel().getSelectedItem() != null &&
                 sourceTypeBox.getSelectionModel().getSelectedItem().equals("Clear")));
     }
 
     @FXML
     public void hidePath(ActionEvent even) {
-        pathFieldTitle.setVisible(false);
-        pathField.setVisible(false);
+        newMenuPath.setVisible(false);
     }
 
     @FXML

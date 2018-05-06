@@ -19,7 +19,7 @@ public class App extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("View/GUI.fxml"));
         Scene mainScene = new Scene(root, resolutionX, resolutionY);
-        mainScene.getStylesheets().add(getClass().getResource("Style.css").toExternalForm());
+        mainScene.getStylesheets().add(App.class.getResource("css/Style.css").toExternalForm());
         primaryStage.setTitle("GraphCalc");
         primaryStage.setScene(mainScene);
         primaryStage.show();
