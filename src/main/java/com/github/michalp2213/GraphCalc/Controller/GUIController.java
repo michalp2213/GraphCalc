@@ -7,6 +7,7 @@ import java.util.HashSet;
 import com.github.michalp2213.GraphCalc.Model.*;
 
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -143,6 +144,12 @@ public class GUIController {
 
             for (Object v : ((Graph) tmp).getAdjacencyList().keySet()) {
                 ((CircleVertex) v).finishIt();
+            }
+
+            for (Object neigh : ((Graph) tmp).getAdjacencyList().values()) {
+                for (Object e : (HashSet) neigh) {
+                    ((LineEdge) e).finishIt();
+                }
             }
 
 			if (tmp instanceof UndirectedGraph) {
