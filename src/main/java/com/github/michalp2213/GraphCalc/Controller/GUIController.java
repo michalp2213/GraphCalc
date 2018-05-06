@@ -367,7 +367,7 @@ public class GUIController {
         Circle c = new Circle(toX, toY, RADIUS);
         for (Edge<Circle> e : graph.getAdjacencyList().get(v)) {
             LineEdge le = (LineEdge) e;
-            if (graph.getClass().equals(UndirectedGraph.class)) {
+            if (graph.getType() == SavableCircleGraph.Type.UNDIRECTED) {
                 Line l = (Line) le.line;
                 Line temp;
                 if (le.to.equals(v)) {
