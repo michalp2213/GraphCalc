@@ -140,7 +140,11 @@ public class GUIController {
     	file = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
     	try {
 			Graph <SerializableCircle> tmp = FileIO.readFromFile(file, workspace);
-			
+
+            for (Object v : ((Graph) tmp).getAdjacencyList().keySet()) {
+                ((CircleVertex) v).finishIt();
+            }
+
 			if (tmp instanceof UndirectedGraph) {
 				graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
 			} else if (tmp instanceof Poset) {
