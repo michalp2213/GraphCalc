@@ -250,7 +250,7 @@ public class GUIController {
     public void workspaceClicked(MouseEvent mouseEvent) {
         if (addVerticesMode) {
             Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
-            graph.addVertex(new CircleVertex(c, workspace));
+            if (!containsCircle(c))graph.addVertex(new CircleVertex(c, workspace));
             c.addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
         }
     }
@@ -547,5 +547,12 @@ public class GUIController {
             workspace.getChildren().clear();
             graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
         }
+    }
+
+    private boolean containsCircle(Circle a) {
+        for (Vertex<Circle> c : graph.getAdjacencyList().keySet()) {
+            if (c.getLabel().getCenterX() == a.getCenterX() && c.getLabel().getCenterY() == a.getCenterY()) return true;
+        }
+        return false;
     }
 }
