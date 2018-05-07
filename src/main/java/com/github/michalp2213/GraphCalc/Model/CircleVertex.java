@@ -29,7 +29,7 @@ public class CircleVertex extends Vertex<Circle> {
         return v.toString();
     }
 
-    @Override
+    /*@Override
     public boolean equals (Object o) {
         if (o instanceof CircleVertex)
             return (this.getSerializableVertex()).equals(((CircleVertex) o).getSerializableVertex());
@@ -39,5 +39,5 @@ public class CircleVertex extends Vertex<Circle> {
     @Override
     public int hashCode() {
         return this.getSerializableVertex().hashCode();
-    }
+    }*/
 }

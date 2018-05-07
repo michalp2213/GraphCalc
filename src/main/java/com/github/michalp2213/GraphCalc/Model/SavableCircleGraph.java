@@ -52,10 +52,10 @@ public class SavableCircleGraph implements Graph<Circle> {
 	}
 	
 	public void addEdge(LineEdge e) {
-		e.draw();
 		
 		drawable.addEdge(e);
 		savable.addEdge(new Edge<>(new SerializableCircleVertex(e.from), new SerializableCircleVertex(e.to)));
+		e.draw();
 	}
 
 	@Override

@@ -80,11 +80,11 @@ public class DirectedGraph<T> implements Graph<T>, Serializable {
     @Override
     public void removeVertex(Vertex<T> v) {
         if (v == null) throw new NullPointerException();
-        for (Edge<T> e : transposedList.get(v)) {
+        if(transposedList.get(v)!=null)for (Edge<T> e : transposedList.get(v)) {
             e.finishIt();
             list.get(e.to).remove(e.transpose());
         }
-        for (Edge<T> e : list.get(v)) {
+        if(list.get(v)!=null)for (Edge<T> e : list.get(v)) {
             e.finishIt();
             transposedList.get(e.to).remove(e.transpose());
         }
