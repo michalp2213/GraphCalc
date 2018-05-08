@@ -22,27 +22,10 @@ public class CircleVertex extends Vertex<Circle> {
     }
     
     public SerializableCircleVertex getSerializableVertex() {
-    	return new SerializableCircleVertex(new SerializableCircle(v));
+    	return new SerializableCircleVertex(new SerializableCircle(v), this.id);
     }
     
     public void draw() {
     	parent.getChildren().add(v);
     }
-
-    @Override
-    public String toString() {
-        return v.toString();
-    }
-
-    /*@Override
-    public boolean equals (Object o) {
-        if (o instanceof CircleVertex)
-            return (this.getSerializableVertex()).equals(((CircleVertex) o).getSerializableVertex());
-        return false;
-    }
-
-    @Override
-    public int hashCode() {
-        return this.getSerializableVertex().hashCode();
-    }*/
 }
