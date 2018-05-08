@@ -194,7 +194,6 @@ public class GUIController {
 			showAlert("ERROR", "Could not open file: " + e.toString());
 		}
 
-
         hideFileMenu();
     }
 
@@ -251,7 +250,6 @@ public class GUIController {
 
     @FXML
     public void spreadVerticesPressed(MouseEvent event) {
-        showNewMenu(new ActionEvent());
         spreadVerticesEvenly();
     }
 
