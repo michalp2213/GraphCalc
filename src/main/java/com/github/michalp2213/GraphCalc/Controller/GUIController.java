@@ -53,7 +53,7 @@ public class GUIController {
     private SavableCircleGraph graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
     private File file = null;
     private FileChooser fileChooser = new FileChooser();
-    private Circle c1, c2;
+    private CircleVertex c1, c2;
     private Boolean addVerticesMode = false;
     private Boolean addEdgesMode = false;
     private Boolean removeObjectsMode = false;
@@ -166,9 +166,9 @@ public class GUIController {
             }
 
             for (Object v : tmp.getAdjacencyList().keySet()) {
-                Circle c = ((SerializableCircleVertex) v).getCircleVertex(workspace).getLabel();
-                graph.addVertex(new CircleVertex(c, workspace));
-            	c.addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
+                CircleVertex u = ((SerializableCircleVertex) v).getCircleVertex(workspace);
+                graph.addVertex(u);
+            	u.getLabel().addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(u));
 			}
 
 			for (Object neigh : tmp.getAdjacencyList().values()) {
@@ -178,19 +178,16 @@ public class GUIController {
 					CircleVertex v = ((SerializableCircleVertex) e.from).getCircleVertex(workspace);
 					CircleVertex u = ((SerializableCircleVertex) e.to).getCircleVertex(workspace);
 
-					c1 = v.getLabel();
-					c2 = u.getLabel();
+					Circle a = v.getLabel();
+					Circle b = u.getLabel();
 
-					Node l = getLine(c1, c2);
+					Node l = getLine(a, b);
 
                     if (graph.containsEdge(new LineEdge(v, u, l, workspace)))
                         continue;
 
 					graph.addEdge(new LineEdge(v, u, l, workspace));
-					l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, c1, c2));
-
-					c1 = null;
-					c2 = null;
+					l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, v, u));
 				}
 			}
 		} catch (IOException e) {
@@ -254,6 +251,7 @@ public class GUIController {
 
     @FXML
     public void spreadVerticesPressed(MouseEvent event) {
+        showNewMenu(new ActionEvent());
         spreadVerticesEvenly();
     }
 
@@ -261,8 +259,11 @@ public class GUIController {
     public void workspaceClicked(MouseEvent mouseEvent) {
         if (addVerticesMode) {
             Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
-            if (!containsCircle(c))graph.addVertex(new CircleVertex(c, workspace));
-            c.addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
+            if (!containsCircle(c)) {
+                CircleVertex v = new CircleVertex(c, workspace);
+                graph.addVertex(v);
+                c.addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(v));
+            }
         }
     }
 
@@ -405,40 +406,37 @@ public class GUIController {
         }
     }
 
-    private EventHandler<MouseEvent> getLineEventHandler(Node l, Circle a, Circle b) {
+    private EventHandler<MouseEvent> getLineEventHandler(Node l, CircleVertex v, CircleVertex u) {
         return event -> {
             if (removeObjectsMode) {
-                graph.removeEdge(new LineEdge(new CircleVertex(a, workspace),
-                        new CircleVertex(b, workspace), l, workspace));
+                graph.removeEdge(new LineEdge(v, u, l, workspace));
             }
         };
     }
 
-    private EventHandler<MouseEvent> getCircleEventHandler(Circle c) {
+    private EventHandler<MouseEvent> getCircleEventHandler(CircleVertex c) {
         return e -> {
             if (removeObjectsMode) {
-                graph.removeVertex(new CircleVertex(c, workspace));
+                graph.removeVertex(c);
             } else if (addEdgesMode) {
                 if (c1 == null) {
                     c1 = c;
-                    c.setFill(Color.RED);
+                    c.getLabel().setFill(Color.RED);
                 } else if (c2 == null) {
                     c2 = c;
-                    Node l = getLine(c1, c2);
+                    Node l = getLine(c1.getLabel(), c2.getLabel());
 
                     l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, c1, c2));
                     try {
-                        if (!graph.containsEdge(new LineEdge(new CircleVertex(c1, workspace),
-                                new CircleVertex(c2, workspace), l, workspace))) {
-                            graph.addEdge(new LineEdge(new CircleVertex(c1, workspace),
-                                    new CircleVertex(c2, workspace), l, workspace));
+                        if (!graph.containsEdge(new LineEdge(c1, c2, l, workspace))) {
+                            graph.addEdge(new LineEdge(c1, c2, l, workspace));
                         }
                     } catch (IllegalArgumentException exception) {
                         showAlert("Wrong edge", "This edge cannot be inserted into poset.");
                     }
-                    c1.setFill(Color.BLACK);
-                    c1.toFront();
-                    c2.toFront();
+                    c1.getLabel().setFill(Color.BLACK);
+                    c1.getLabel().toFront();
+                    c2.getLabel().toFront();
                     c1 = null;
                     c2 = null;
                 }
@@ -449,23 +447,21 @@ public class GUIController {
     private void graphFromMatrix(String s) {
         try (Scanner sc = new Scanner(new File(s))) {
             int n = sc.nextInt();
-            Circle arr[] = new Circle[n];
+            CircleVertex arr[] = new CircleVertex[n];
             for (int i = 0; i < n; i++) {
-                arr[i] = new Circle(0, i, RADIUS);
-                arr[i].addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
-                graph.addVertex(new CircleVertex(arr[i], workspace));
+                arr[i] = new CircleVertex(new Circle (0, i, RADIUS), workspace);
+                arr[i].getLabel().addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
+                graph.addVertex(arr[i]);
             }
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     int a = sc.nextInt();
                     if (a == 1) {
-                        Node l = getLine(arr[i], arr[j]);
+                        Node l = getLine(arr[i].getLabel(), arr[j].getLabel());
                         l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, arr[i], arr[j]));
                         try {
-                            if (!graph.containsEdge(new LineEdge(new CircleVertex(arr[i], workspace),
-                                    new CircleVertex(arr[j], workspace), l, workspace))) {
-                                graph.addEdge(new LineEdge(new CircleVertex(arr[i], workspace),
-                                        new CircleVertex(arr[j], workspace), l, workspace));
+                            if (!graph.containsEdge(new LineEdge(arr[i], arr[j], l, workspace))) {
+                                graph.addEdge(new LineEdge(arr[i], arr[j], l, workspace));
                             }
                         } catch (IllegalArgumentException exception) {
                             showAlert("Wrong edge", "File has an edge\n that cannot be inserted into poset.");
@@ -488,23 +484,21 @@ public class GUIController {
     private void graphFromList(String s) {
         try (Scanner sc = new Scanner(new File(s))) {
             int n = sc.nextInt();
-            Circle arr[] = new Circle[n];
+            CircleVertex arr[] = new CircleVertex[n];
             for (int i = 0; i < n; i++) {
-                arr[i] = new Circle(0, i, RADIUS);
-                arr[i].addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
-                graph.addVertex(new CircleVertex(arr[i], workspace));
+                arr[i] = new CircleVertex(new Circle(0, i, RADIUS), workspace);
+                arr[i].getLabel().addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
+                graph.addVertex(arr[i]);
             }
             for (int i = 0; i < n; i++) {
                 int k = sc.nextInt();
                 for (int j = 0; j < k; j++) {
                     int a = sc.nextInt();
-                    Node l = getLine(arr[i], arr[a - 1]);
+                    Node l = getLine(arr[i].getLabel(), arr[a - 1].getLabel());
                     l.addEventHandler(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, arr[i], arr[a - 1]));
                     try {
-                        if (!graph.containsEdge(new LineEdge(new CircleVertex(arr[i], workspace),
-                                new CircleVertex(arr[a - 1], workspace), l, workspace))) {
-                            graph.addEdge(new LineEdge(new CircleVertex(arr[i], workspace),
-                                    new CircleVertex(arr[a - 1], workspace), l, workspace));
+                        if (!graph.containsEdge(new LineEdge(arr[i], arr[a - 1], l, workspace))) {
+                            graph.addEdge(new LineEdge(arr[i], arr[a - 1], l, workspace));
                         }
                     } catch (IllegalArgumentException exception) {
                         showAlert("Wrong edge", "File has an edge\n that cannot be inserted into poset.");
@@ -527,21 +521,19 @@ public class GUIController {
         try (Scanner sc = new Scanner(new File(s))) {
             int n = sc.nextInt();
             int m = sc.nextInt();
-            Circle arr[] = new Circle[n];
+            CircleVertex arr[] = new CircleVertex[n];
             for (int i = 0; i < n; i++) {
-                arr[i] = new Circle(0, i, RADIUS);
-                arr[i].addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
-                graph.addVertex(new CircleVertex(arr[i], workspace));
+                arr[i] = new CircleVertex(new Circle(0, i, RADIUS), workspace);
+                arr[i].getLabel().addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
+                graph.addVertex(arr[i]);
             }
             for (int i = 0; i < m; i++) {
                 int a = sc.nextInt();
                 int b = sc.nextInt();
-                Node l = getLine(arr[a - 1], arr[b - 1]);
+                Node l = getLine(arr[a - 1].getLabel(), arr[b - 1].getLabel());
                 try {
-                    if (!graph.containsEdge(new LineEdge(new CircleVertex(arr[a - 1], workspace),
-                            new CircleVertex(arr[b - 1], workspace), l, workspace))) {
-                        graph.addEdge(new LineEdge(new CircleVertex(arr[a - 1], workspace),
-                                new CircleVertex(arr[b - 1], workspace), l, workspace));
+                    if (!graph.containsEdge(new LineEdge(arr[a - 1], arr[b - 1], l, workspace))) {
+                        graph.addEdge(new LineEdge(arr[a - 1], arr[b - 1], l, workspace));
                         l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, arr[a - 1], arr[b - 1]));
                     }
                 } catch (IllegalArgumentException exception) {

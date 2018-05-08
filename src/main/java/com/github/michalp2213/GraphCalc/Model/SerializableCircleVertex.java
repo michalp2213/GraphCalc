@@ -17,6 +17,6 @@ public class SerializableCircleVertex extends Vertex<SerializableCircle> impleme
 	}
 	
 	public CircleVertex getCircleVertex(Pane parent) {
-		return new CircleVertex(v.getCircle(), parent);
+		return new CircleVertex(v.getCircle(), this.id, parent);
 	}
 }

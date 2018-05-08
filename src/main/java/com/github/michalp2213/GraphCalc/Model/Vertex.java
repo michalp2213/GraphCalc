@@ -9,10 +9,20 @@ import java.io.Serializable;
  */
 
 public class Vertex<T> implements Serializable {
+    private static long next_id = 0;
+    protected long id;
     protected final T v;
 
     public Vertex(T v) {
         this.v = v;
+
+        this.id = Vertex.next_id;
+        ++ next_id;
+    }
+
+    protected Vertex(T v, long id) {
+        this.v = v;
+        this.id = id;
     }
 
     /**
@@ -34,11 +44,19 @@ public class Vertex<T> implements Serializable {
             return ((Circle)((Vertex) obj).v).getCenterX() == ((Circle)v).getCenterX() &&
                     ((Circle)((Vertex) obj).v).getCenterY() == ((Circle) v).getCenterY();
         }*/
-        return ((Vertex) obj).v.equals(v);
+        return this.id == ((Vertex) obj).id;
     }
 
     @Override
     public int hashCode() {
         return v.hashCode();
+    }
+
+    @Override
+    public Vertex<T> clone() {
+        Vertex<T> ret = new Vertex<>(this.v);
+        ret.id = this.id;
+
+        return ret;
     }
 }

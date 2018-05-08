@@ -11,6 +11,11 @@ public class CircleVertex extends Vertex<Circle> {
         this.parent = parent;
     }
 
+    protected CircleVertex(Circle v, long id, Pane parent) {
+        super(v, id);
+        this.parent = parent;
+    }
+
     @Override
     public void finishIt(){
         parent.getChildren().remove(v);
