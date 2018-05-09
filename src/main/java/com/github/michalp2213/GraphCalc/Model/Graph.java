@@ -3,28 +3,26 @@ package com.github.michalp2213.GraphCalc.Model;
 import java.util.HashSet;
 import java.util.Map;
 
-/*
+/**
  * Graph interface describing basic operations on graph.
  */
 
-import java.util.HashSet;
-import java.util.Map;
 
-public interface Graph<T> {
+public interface Graph {
 
-    Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList();
+    Map<Vertex, ? extends HashSet<Edge>> getAdjacencyList();
 
-    Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getTransposedAdjacencyList();
+    Map<Vertex, ? extends HashSet<Edge>>  getTransposedAdjacencyList();
 
-    void addVertex(Vertex<T> v);
+    void addVertex(Vertex v);
 
-    void addEdge(Edge<T> e);
+    void addEdge(Edge e);
 
-    void removeVertex(Vertex<T> v);
+    void removeVertex(Vertex v);
 
-    void removeEdge(Edge<T> e);
+    void removeEdge(Edge e);
 
-    boolean containsVertex(Vertex<T> v);
+    boolean containsVertex(Vertex v);
 
-    boolean containsEdge(Edge<T> e);
+    boolean containsEdge(Edge e);
 }

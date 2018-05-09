@@ -1,23 +1,22 @@
 package com.github.michalp2213.GraphCalc.Model;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
 
-/*
+/**
  * Class describing edge.
  */
 
-public class Edge<T> implements Serializable {
-    public final Vertex<T> from;
-    public final Vertex<T> to;
-    protected HashMap<Class, Object> attributes;
+public class Edge {
+    public final Vertex from;
+    public final Vertex to;
+    private HashMap<Class<? extends Attribute>, Attribute> attributes;
 
     /**
      * Basic constructor.
      */
 
-    public Edge(Vertex<T> from, Vertex<T> to) {
+    public Edge(Vertex from, Vertex to) {
         this(from, to, new HashMap<>());
     }
 
@@ -25,40 +24,34 @@ public class Edge<T> implements Serializable {
      * Constructor for edge with attributes.
      */
 
-    public Edge(Vertex<T> from, Vertex<T> to, HashMap<Class, Object> attributes) {
+    public Edge(Vertex from, Vertex to, HashMap<Class<? extends Attribute>, Attribute> attributes) {
         this.from = from;
         this.to = to;
         this.attributes = new HashMap<>(attributes);
     }
 
-    public Edge<T> transpose() {
-        return new Edge<>(to, from, attributes);
+    public Edge transpose() {
+        return new Edge(to, from, attributes);
     }
 
     /**
      * Adding new attribute, or changing existing.
      */
 
-    public void setAttribute(Object o) {
-        attributes.put(o.getClass(), o);
+    public <T extends Attribute> void setAttribute(Class<T> cl, T attribute) {
+        attributes.put(cl, attribute);
     }
 
-    public Object getAttribute(Class cl){
-        return attributes.get(cl);
-    }
-
-    /**
-     * Function that will be called before removing edge from graph.
-     */
-
-    public void finishIt(){
+    @SuppressWarnings("unchecked")
+    public <T extends Attribute> T getAttribute(Class<T> cl) {
+        return (T) attributes.get(cl);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof Edge)) return false;
         Edge e = (Edge) obj;
-        return e.attributes.equals(attributes) && e.to.equals(to) && e.from.equals(from);
+        return e.to.equals(to) && e.from.equals(from) && e.attributes.equals(attributes);
     }
 
     @Override

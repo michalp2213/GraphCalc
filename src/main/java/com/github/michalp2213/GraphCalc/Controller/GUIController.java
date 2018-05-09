@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Scanner;
 
@@ -50,13 +51,15 @@ public class GUIController {
     public Label graphLabel;
     public Label sourceLabel;
     public Label pathLabel;
-    private SavableCircleGraph graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
+    private Graph graph = new UndirectedGraph();
     private File file = null;
     private FileChooser fileChooser = new FileChooser();
     private Circle c1, c2;
     private Boolean addVerticesMode = false;
     private Boolean addEdgesMode = false;
     private Boolean removeObjectsMode = false;
+    private HashMap<Vertex, Circle> circles = new HashMap<>();
+    private HashMap<Edge, Node> lines = new HashMap<>();
 
     @FXML
     public void showFileMenu() {
@@ -101,13 +104,13 @@ public class GUIController {
     public void newMenuAcceptAndExit(ActionEvent event) {
         switch (graphTypeBox.getSelectionModel().getSelectedItem()) {
             case "Undirected":
-                graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
+                graph = new UndirectedGraph();
                 break;
             case "Directed":
-                graph = new SavableCircleGraph(SavableCircleGraph.Type.DIRECTED);
+                graph = new DirectedGraph();
                 break;
             case "Poset":
-                graph = new SavableCircleGraph(SavableCircleGraph.Type.POSET);
+                graph = new Poset();
                 break;
         }
         workspace.getChildren().clear();
@@ -141,88 +144,17 @@ public class GUIController {
 
     @FXML
     public void openClicked(ActionEvent event) {
-    	file = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
-    	if (file == null)
-    	    return;
-    	try {
-			Graph <SerializableCircle> tmp = FileIO.readFromFile(file, workspace);
-
-            for (Object v : ((Graph) graph).getAdjacencyList().keySet()) {
-                ((CircleVertex) v).finishIt();
-            }
-
-            for (Object neigh : ((Graph) graph).getAdjacencyList().values()) {
-                for (Object e : (HashSet) neigh) {
-                    ((LineEdge) e).finishIt();
-                }
-            }
-
-            if (tmp instanceof UndirectedGraph) {
-                graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
-            } else if (tmp instanceof Poset) {
-                graph = new SavableCircleGraph(SavableCircleGraph.Type.POSET);
-            } else if (tmp instanceof DirectedGraph) {
-                graph = new SavableCircleGraph(SavableCircleGraph.Type.DIRECTED);
-            }
-
-            for (Object v : tmp.getAdjacencyList().keySet()) {
-                Circle c = ((SerializableCircleVertex) v).getCircleVertex(workspace).getLabel();
-                graph.addVertex(new CircleVertex(c, workspace));
-            	c.addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
-			}
-
-			for (Object neigh : tmp.getAdjacencyList().values()) {
-				for (Object x : (HashSet) neigh) {
-					Edge <SerializableCircle> e = (Edge<SerializableCircle>) x;
-					
-					CircleVertex v = ((SerializableCircleVertex) e.from).getCircleVertex(workspace);
-					CircleVertex u = ((SerializableCircleVertex) e.to).getCircleVertex(workspace);
-
-					c1 = v.getLabel();
-					c2 = u.getLabel();
-
-					Node l = getLine(c1, c2);
-
-                    if (graph.containsEdge(new LineEdge(v, u, l, workspace)))
-                        continue;
-
-					graph.addEdge(new LineEdge(v, u, l, workspace));
-					l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, c1, c2));
-
-					c1 = null;
-					c2 = null;
-				}
-			}
-		} catch (IOException e) {
-			showAlert("ERROR", "Could not open file: " + e.toString());
-		}
-
-
-        hideFileMenu();
+    	//TODO
     }
 
     @FXML
     public void saveClicked(ActionEvent event) {
-        if (file == null) {
-            saveAsClicked(event);
-        } else {
-            try {
-                FileIO.writeToFile(file, graph);
-            } catch (IOException e) {
-                showAlert("ERROR", "Could not save file: " + e.toString());
-            }
-        }
-        hideFileMenu();
+        //TODO
     }
 
     @FXML
     public void saveAsClicked(ActionEvent event) {
-    	file = fileChooser.showSaveDialog(mainFrame.getScene().getWindow());
-    	if (file == null)
-    	    return;
-    	saveClicked(event);
-
-        hideFileMenu();
+    	//TODO
     }
 
     @FXML
@@ -260,9 +192,10 @@ public class GUIController {
     @FXML
     public void workspaceClicked(MouseEvent mouseEvent) {
         if (addVerticesMode) {
+            /*TODO
             Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
             if (!containsCircle(c))graph.addVertex(new CircleVertex(c, workspace));
-            c.addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
+            c.addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));*/
         }
     }
 
@@ -294,6 +227,7 @@ public class GUIController {
         double startX = a.getCenterX(), startY = a.getCenterY(), endX = b.getCenterX(), endY = b.getCenterY();
         double vecLength = Math.sqrt((a.getCenterX() + b.getCenterX()) * (a.getCenterX() + b.getCenterX()) +
                 (a.getCenterY() + b.getCenterY()) * (a.getCenterY() + b.getCenterY()));
+        /*TODO
         if (vecLength != 0) {
             double unitVecX = (b.getCenterX() - a.getCenterX()) / vecLength;
             double unitVecY = (b.getCenterY() - a.getCenterY()) / vecLength;
@@ -309,8 +243,8 @@ public class GUIController {
             line = new Line(startX, startY, endX, endY);
         } else {
             line = new DirectedLine(startX, startY, endX, endY);
-        }
-        return line;
+        }*/
+        return null;
     }
 
     private void showAlert(String message, String message2) {
@@ -320,7 +254,8 @@ public class GUIController {
         alert.showAndWait();
     }
 
-    private void moveVertex(CircleVertex v, double toX, double toY) {
+    private void moveCircle(Circle v, double toX, double toY) {
+        /*TODO
         Circle c = new Circle(toX, toY, RADIUS);
         for (Edge<Circle> e : graph.getAdjacencyList().get(v)) {
             LineEdge le = (LineEdge) e;
@@ -379,10 +314,11 @@ public class GUIController {
             }
         }
         v.getLabel().setCenterX(toX);
-        v.getLabel().setCenterY(toY);
+        v.getLabel().setCenterY(toY);*/
     }
 
     private void spreadVerticesEvenly() {
+        /*TODO
         if (graph.getAdjacencyList().keySet().size() != 0) {
             double midX = workspace.getWidth() / 2;
             double midY = workspace.getHeight() / 2;
@@ -402,21 +338,20 @@ public class GUIController {
                     j++;
                 }
             }
-        }
+        }*/
     }
 
     private EventHandler<MouseEvent> getLineEventHandler(Node l, Circle a, Circle b) {
         return event -> {
             if (removeObjectsMode) {
-                graph.removeEdge(new LineEdge(new CircleVertex(a, workspace),
-                        new CircleVertex(b, workspace), l, workspace));
+                //TODO
             }
         };
     }
 
     private EventHandler<MouseEvent> getCircleEventHandler(Circle c) {
         return e -> {
-            if (removeObjectsMode) {
+            /*TODOif (removeObjectsMode) {
                 graph.removeVertex(new CircleVertex(c, workspace));
             } else if (addEdgesMode) {
                 if (c1 == null) {
@@ -442,11 +377,12 @@ public class GUIController {
                     c1 = null;
                     c2 = null;
                 }
-            }
+            }*/
         };
     }
 
     private void graphFromMatrix(String s) {
+        /*TODO
         try (Scanner sc = new Scanner(new File(s))) {
             int n = sc.nextInt();
             Circle arr[] = new Circle[n];
@@ -482,10 +418,11 @@ public class GUIController {
             showAlert("Something has gone wrong", "Data representing graph was in wrong format");
             workspace.getChildren().clear();
             graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
-        }
+        }*/
     }
 
     private void graphFromList(String s) {
+        /*TODO
         try (Scanner sc = new Scanner(new File(s))) {
             int n = sc.nextInt();
             Circle arr[] = new Circle[n];
@@ -520,10 +457,11 @@ public class GUIController {
             showAlert("Something has gone wrong", "Data representing graph was in wrong format");
             workspace.getChildren().clear();
             graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
-        }
+        }*/
     }
 
     private void graphFromEdgeList(String s) {
+        /*TODO
         try (Scanner sc = new Scanner(new File(s))) {
             int n = sc.nextInt();
             int m = sc.nextInt();
@@ -556,13 +494,14 @@ public class GUIController {
         } catch (Exception e) {
             showAlert("Something has gone wrong", "Data representing graph was in wrong format");
             workspace.getChildren().clear();
-            graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
-        }
+            graph = new UndirectedGraph();
+        }*/
     }
 
     private boolean containsCircle(Circle a) {
-        for (Vertex<Circle> c : graph.getAdjacencyList().keySet()) {
-            if (c.getLabel().getCenterX() == a.getCenterX() && c.getLabel().getCenterY() == a.getCenterY()) return true;
+        for(Circle c : circles.values()){
+            if(c.getCenterX()==a.getCenterX()&&c.getCenterY()==a.getCenterY())
+                return true;
         }
         return false;
     }
