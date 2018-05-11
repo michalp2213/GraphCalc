@@ -15,9 +15,8 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Map;
 import java.util.Scanner;
 
 
@@ -51,6 +50,7 @@ public class GUIController {
     public Label graphLabel;
     public Label sourceLabel;
     public Label pathLabel;
+    private int id = 0;
     private Graph graph = new UndirectedGraph();
     private File file = null;
     private FileChooser fileChooser = new FileChooser();
@@ -102,6 +102,7 @@ public class GUIController {
 
     @FXML
     public void newMenuAcceptAndExit(ActionEvent event) {
+        reset();
         switch (graphTypeBox.getSelectionModel().getSelectedItem()) {
             case "Undirected":
                 graph = new UndirectedGraph();
@@ -113,7 +114,6 @@ public class GUIController {
                 graph = new Poset();
                 break;
         }
-        workspace.getChildren().clear();
         switch (sourceTypeBox.getSelectionModel().getSelectedItem()) {
             case "Clear":
                 break;
@@ -144,7 +144,7 @@ public class GUIController {
 
     @FXML
     public void openClicked(ActionEvent event) {
-    	//TODO
+        //TODO
     }
 
     @FXML
@@ -154,7 +154,7 @@ public class GUIController {
 
     @FXML
     public void saveAsClicked(ActionEvent event) {
-    	//TODO
+        //TODO
     }
 
     @FXML
@@ -192,10 +192,12 @@ public class GUIController {
     @FXML
     public void workspaceClicked(MouseEvent mouseEvent) {
         if (addVerticesMode) {
-            /*TODO
             Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
-            if (!containsCircle(c))graph.addVertex(new CircleVertex(c, workspace));
-            c.addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));*/
+            if (!containsCircle(c)) {
+                circles.put(getVertex(), c);
+                workspace.getChildren().add(c);
+                c.addEventHandler(MouseEvent.MOUSE_CLICKED,getCircleEventHandler(c));
+            }
         }
     }
 
@@ -227,7 +229,6 @@ public class GUIController {
         double startX = a.getCenterX(), startY = a.getCenterY(), endX = b.getCenterX(), endY = b.getCenterY();
         double vecLength = Math.sqrt((a.getCenterX() + b.getCenterX()) * (a.getCenterX() + b.getCenterX()) +
                 (a.getCenterY() + b.getCenterY()) * (a.getCenterY() + b.getCenterY()));
-        /*TODO
         if (vecLength != 0) {
             double unitVecX = (b.getCenterX() - a.getCenterX()) / vecLength;
             double unitVecY = (b.getCenterY() - a.getCenterY()) / vecLength;
@@ -239,12 +240,12 @@ public class GUIController {
             endX = midX + distFromMid * unitVecX;
             endY = midY + distFromMid * unitVecY;
         }
-        if (graph.getType() == SavableCircleGraph.Type.UNDIRECTED) {
+        if (graph.getClass().equals(UndirectedGraph.class)) {
             line = new Line(startX, startY, endX, endY);
         } else {
             line = new DirectedLine(startX, startY, endX, endY);
-        }*/
-        return null;
+        }
+        return line;
     }
 
     private void showAlert(String message, String message2) {
@@ -253,39 +254,39 @@ public class GUIController {
         alert.setContentText(message2);
         alert.showAndWait();
     }
-
-    private void moveCircle(Circle v, double toX, double toY) {
-        /*TODO
+    @SuppressWarnings("Duplicates")
+    private void moveCircle(Circle a, double toX, double toY) {
+        Vertex v = getVertex(a);
         Circle c = new Circle(toX, toY, RADIUS);
-        for (Edge<Circle> e : graph.getAdjacencyList().get(v)) {
-            LineEdge le = (LineEdge) e;
-            if (graph.getType() == SavableCircleGraph.Type.UNDIRECTED) {
-                Line l = (Line) le.line;
+        for (Edge e : graph.getAdjacencyList().get(v)) {
+            if (graph.getClass().equals(UndirectedGraph.class)) {
+                Line l = (Line) lines.get(e);
+                if(l == null) l = (Line) lines.get(e.transpose());
                 Line temp;
-                if (le.to.equals(v)) {
-                    if (le.from.equals(v)) {
+                if (e.to.equals(v)) {
+                    if (e.from.equals(v)) {
                         temp = (Line) getLine(c, c);
                     } else {
-                        temp = (Line) getLine(le.from.getLabel(), c);
+                        temp = (Line) getLine(circles.get(e.from), c);
                     }
                 } else {
-                    temp = (Line) getLine(c, le.to.getLabel());
+                    temp = (Line) getLine(c, circles.get(e.to));
                 }
                 l.setStartX(temp.getStartX());
                 l.setStartY(temp.getStartY());
                 l.setEndX(temp.getEndX());
                 l.setEndY(temp.getEndY());
             } else {
-                DirectedLine l = (DirectedLine) le.line;
+                DirectedLine l = (DirectedLine) lines.get(e);
                 DirectedLine temp;
-                if (le.to.equals(v)) {
-                    if (le.from.equals(v)) {
+                if (e.to.equals(v)) {
+                    if (e.from.equals(v)) {
                         temp = (DirectedLine) getLine(c, c);
                     } else {
-                        temp = (DirectedLine) getLine(le.from.getLabel(), c);
+                        temp = (DirectedLine) getLine(circles.get(e.from), c);
                     }
                 } else {
-                    temp = (DirectedLine) getLine(c, le.to.getLabel());
+                    temp = (DirectedLine) getLine(c, circles.get(e.to));
                 }
                 l.setStartX(temp.getStartX());
                 l.setStartY(temp.getStartY());
@@ -293,19 +294,18 @@ public class GUIController {
                 l.setEndY(temp.getEndY());
             }
         }
-        if (graph.getType() == SavableCircleGraph.Type.DIRECTED) {
-            for (Edge<Circle> e : graph.getTransposedAdjacencyList().get(v)) {
-                LineEdge le = (LineEdge) e;
-                DirectedLine l = (DirectedLine) le.line;
+        if (!graph.getClass().equals(UndirectedGraph.class)) {
+            for (Edge e : graph.getTransposedAdjacencyList().get(v)) {
+                DirectedLine l = (DirectedLine) lines.get(e.transpose());
                 DirectedLine temp;
-                if (le.to.equals(v)) {
-                    if (le.from.equals(v)) {
+                if (e.to.equals(v)) {
+                    if (e.from.equals(v)) {
                         temp = (DirectedLine) getLine(c, c);
                     } else {
-                        temp = (DirectedLine) getLine(c, le.from.getLabel());
+                        temp = (DirectedLine) getLine(c, circles.get(e.from));
                     }
                 } else {
-                    temp = (DirectedLine) getLine(le.to.getLabel(), c);
+                    temp = (DirectedLine) getLine(circles.get(e.to), c);
                 }
                 l.setStartX(temp.getStartX());
                 l.setStartY(temp.getStartY());
@@ -313,46 +313,50 @@ public class GUIController {
                 l.setEndY(temp.getEndY());
             }
         }
-        v.getLabel().setCenterX(toX);
-        v.getLabel().setCenterY(toY);*/
+        a.setCenterX(toX);
+        a.setCenterY(toY);
     }
 
     private void spreadVerticesEvenly() {
-        /*TODO
         if (graph.getAdjacencyList().keySet().size() != 0) {
             double midX = workspace.getWidth() / 2;
             double midY = workspace.getHeight() / 2;
             if (graph.getAdjacencyList().keySet().size() == 1) {
-                CircleVertex v = (CircleVertex) graph.getAdjacencyList().keySet().iterator().next();
-                moveVertex(v, midX, midY);
+                Circle v = circles.get(graph.getAdjacencyList().keySet().iterator().next());
+                moveCircle(v, midX, midY);
             } else {
                 double polygonRadius = Math.min(2 * midX / 3, 2 * midY / 3);
                 int k = graph.getAdjacencyList().keySet().size();
                 int j = 0;
-                for (Vertex<Circle> vT : graph.getAdjacencyList().keySet()) {
-                    CircleVertex v = (CircleVertex) vT;
+                for (Vertex vT : graph.getAdjacencyList().keySet()) {
+                    Circle v = circles.get(vT);
                     double arg = (2 * j * Math.PI) / k;
                     double toX = Math.cos(arg) * polygonRadius + midX;
                     double toY = Math.sin(arg) * polygonRadius + midY;
-                    moveVertex(v, toX, toY);
+                    moveCircle(v, toX, toY);
                     j++;
                 }
             }
-        }*/
+        }
     }
 
-    private EventHandler<MouseEvent> getLineEventHandler(Node l, Circle a, Circle b) {
+    private EventHandler<MouseEvent> getLineEventHandler(Node l) {
         return event -> {
             if (removeObjectsMode) {
-                //TODO
+                Edge e = getEdge(l);
+                if(e!=null){
+                    workspace.getChildren().remove(l);
+                    graph.removeEdge(e);
+                    lines.remove(e);
+                }
             }
         };
     }
 
     private EventHandler<MouseEvent> getCircleEventHandler(Circle c) {
         return e -> {
-            /*TODOif (removeObjectsMode) {
-                graph.removeVertex(new CircleVertex(c, workspace));
+            if (removeObjectsMode) {
+                removeCircle(c);
             } else if (addEdgesMode) {
                 if (c1 == null) {
                     c1 = c;
@@ -360,14 +364,10 @@ public class GUIController {
                 } else if (c2 == null) {
                     c2 = c;
                     Node l = getLine(c1, c2);
-
-                    l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, c1, c2));
+                    Vertex v1 = getVertex(c1), v2 = getVertex(c2);
+                    Edge edge = getEdge(v1, v2);
                     try {
-                        if (!graph.containsEdge(new LineEdge(new CircleVertex(c1, workspace),
-                                new CircleVertex(c2, workspace), l, workspace))) {
-                            graph.addEdge(new LineEdge(new CircleVertex(c1, workspace),
-                                    new CircleVertex(c2, workspace), l, workspace));
-                        }
+                        putEdge(edge, l);
                     } catch (IllegalArgumentException exception) {
                         showAlert("Wrong edge", "This edge cannot be inserted into poset.");
                     }
@@ -377,36 +377,27 @@ public class GUIController {
                     c1 = null;
                     c2 = null;
                 }
-            }*/
+            }
         };
     }
 
     private void graphFromMatrix(String s) {
-        /*TODO
         try (Scanner sc = new Scanner(new File(s))) {
             int n = sc.nextInt();
             Circle arr[] = new Circle[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = new Circle(0, i, RADIUS);
-                arr[i].addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
-                graph.addVertex(new CircleVertex(arr[i], workspace));
-            }
+            Vertex arr1[] = new Vertex[n];
+            prepareArrays(arr, arr1, n);
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
                     int a = sc.nextInt();
                     if (a == 1) {
                         Node l = getLine(arr[i], arr[j]);
-                        l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, arr[i], arr[j]));
+                        Edge edge = getEdge(arr1[i], arr1[j]);
                         try {
-                            if (!graph.containsEdge(new LineEdge(new CircleVertex(arr[i], workspace),
-                                    new CircleVertex(arr[j], workspace), l, workspace))) {
-                                graph.addEdge(new LineEdge(new CircleVertex(arr[i], workspace),
-                                        new CircleVertex(arr[j], workspace), l, workspace));
-                            }
+                            putEdge(edge, l);
                         } catch (IllegalArgumentException exception) {
                             showAlert("Wrong edge", "File has an edge\n that cannot be inserted into poset.");
-                            workspace.getChildren().clear();
-                            graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
+                            reset();
                             return;
                         }
                     }
@@ -416,37 +407,27 @@ public class GUIController {
             showAlert("File not found", "Please provide existing file");
         } catch (Exception e) {
             showAlert("Something has gone wrong", "Data representing graph was in wrong format");
-            workspace.getChildren().clear();
-            graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
-        }*/
+            reset();
+        }
     }
 
     private void graphFromList(String s) {
-        /*TODO
         try (Scanner sc = new Scanner(new File(s))) {
             int n = sc.nextInt();
             Circle arr[] = new Circle[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = new Circle(0, i, RADIUS);
-                arr[i].addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
-                graph.addVertex(new CircleVertex(arr[i], workspace));
-            }
+            Vertex arr1[] = new Vertex[n];
+            prepareArrays(arr, arr1, n);
             for (int i = 0; i < n; i++) {
                 int k = sc.nextInt();
                 for (int j = 0; j < k; j++) {
                     int a = sc.nextInt();
                     Node l = getLine(arr[i], arr[a - 1]);
-                    l.addEventHandler(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, arr[i], arr[a - 1]));
+                    Edge edge = getEdge(arr1[i], arr1[a-1]);
                     try {
-                        if (!graph.containsEdge(new LineEdge(new CircleVertex(arr[i], workspace),
-                                new CircleVertex(arr[a - 1], workspace), l, workspace))) {
-                            graph.addEdge(new LineEdge(new CircleVertex(arr[i], workspace),
-                                    new CircleVertex(arr[a - 1], workspace), l, workspace));
-                        }
+                        putEdge(edge, l);
                     } catch (IllegalArgumentException exception) {
                         showAlert("Wrong edge", "File has an edge\n that cannot be inserted into poset.");
-                        workspace.getChildren().clear();
-                        graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
+                        reset();
                         return;
                     }
                 }
@@ -455,37 +436,27 @@ public class GUIController {
             showAlert("File not found", "Please provide existing file");
         } catch (Exception e) {
             showAlert("Something has gone wrong", "Data representing graph was in wrong format");
-            workspace.getChildren().clear();
-            graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
-        }*/
+            reset();
+        }
     }
 
     private void graphFromEdgeList(String s) {
-        /*TODO
         try (Scanner sc = new Scanner(new File(s))) {
             int n = sc.nextInt();
             int m = sc.nextInt();
             Circle arr[] = new Circle[n];
-            for (int i = 0; i < n; i++) {
-                arr[i] = new Circle(0, i, RADIUS);
-                arr[i].addEventFilter(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
-                graph.addVertex(new CircleVertex(arr[i], workspace));
-            }
+            Vertex arr1[] = new Vertex[n];
+            prepareArrays(arr, arr1, n);
             for (int i = 0; i < m; i++) {
                 int a = sc.nextInt();
                 int b = sc.nextInt();
                 Node l = getLine(arr[a - 1], arr[b - 1]);
+                Edge edge = getEdge(arr1[a-1], arr1[b-1]);
                 try {
-                    if (!graph.containsEdge(new LineEdge(new CircleVertex(arr[a - 1], workspace),
-                            new CircleVertex(arr[b - 1], workspace), l, workspace))) {
-                        graph.addEdge(new LineEdge(new CircleVertex(arr[a - 1], workspace),
-                                new CircleVertex(arr[b - 1], workspace), l, workspace));
-                        l.addEventFilter(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l, arr[a - 1], arr[b - 1]));
-                    }
+                    putEdge(edge, l);
                 } catch (IllegalArgumentException exception) {
                     showAlert("Wrong edge", "File has an edge\n that cannot be inserted into poset.");
-                    workspace.getChildren().clear();
-                    graph = new SavableCircleGraph(SavableCircleGraph.Type.UNDIRECTED);
+                    reset();
                     return;
                 }
             }
@@ -493,16 +464,106 @@ public class GUIController {
             showAlert("File not found", "Please provide existing file");
         } catch (Exception e) {
             showAlert("Something has gone wrong", "Data representing graph was in wrong format");
-            workspace.getChildren().clear();
-            graph = new UndirectedGraph();
-        }*/
+            reset();
+        }
     }
 
     private boolean containsCircle(Circle a) {
-        for(Circle c : circles.values()){
-            if(c.getCenterX()==a.getCenterX()&&c.getCenterY()==a.getCenterY())
+        for (Circle c : circles.values()) {
+            if (c.getCenterX() == a.getCenterX() && c.getCenterY() == a.getCenterY())
                 return true;
         }
         return false;
+    }
+
+    private void removeLine(Edge e){
+        Node l = lines.get(e);
+        lines.remove(e);
+        workspace.getChildren().remove(l);
+        l = lines.get(e.transpose());
+        lines.remove(e.transpose());
+        workspace.getChildren().remove(l);
+    }
+
+    private void removeCircle(Circle a) {
+        Vertex v = getVertex(a);
+        if(v==null) return;
+        for (Edge e : graph.getAdjacencyList().get(v)) {
+            removeLine(e);
+        }
+        for (Edge e : graph.getTransposedAdjacencyList().get(v)) {
+            removeLine(e);
+        }
+        circles.remove(v);
+        workspace.getChildren().remove(a);
+        graph.removeVertex(v);
+    }
+
+    private Vertex getVertex(Circle a){
+        Vertex v = null;
+        for (Map.Entry<Vertex, Circle> m : circles.entrySet()) {
+            if (m.getValue().equals(a)) {
+                v = m.getKey();
+                break;
+            }
+        }
+        return v;
+    }
+
+    private Edge getEdge(Node l){
+        Edge e = null;
+        for (Map.Entry<Edge, Node> m : lines.entrySet()) {
+            if (m.getValue().equals(l)) {
+                e = m.getKey();
+                break;
+            }
+        }
+        return e;
+    }
+
+    /**
+     * @return vertex with desired attributes;
+     */
+
+    private Vertex getVertex(){
+        return new Vertex(id++);
+    }
+
+    /**
+     * @return edge with desired attributes.
+     */
+
+    private Edge getEdge(Vertex v1, Vertex v2){
+        return new Edge(v1, v2);
+    }
+
+    private void putEdge(Edge edge, Node l){
+        if (!graph.containsEdge(edge)){
+            graph.addEdge(edge);
+            lines.put(edge, l);
+            l.addEventHandler(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l));
+            workspace.getChildren().add(l);
+
+        }
+    }
+
+    private void reset(){
+        workspace.getChildren().clear();
+        graph = new UndirectedGraph();
+        id = 0;
+        circles.clear();
+        lines.clear();
+    }
+
+    private void prepareArrays(Circle arr[], Vertex arr1[], int n){
+        for (int i = 0; i < n; i++) {
+            arr[i] = new Circle(0, i+1, RADIUS);
+            arr[i].addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
+            Vertex v = getVertex();
+            arr1[i] = v;
+            graph.addVertex(v);
+            circles.put(v, arr[i]);
+            workspace.getChildren().add(arr[i]);
+        }
     }
 }
