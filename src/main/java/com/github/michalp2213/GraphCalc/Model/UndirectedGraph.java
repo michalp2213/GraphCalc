@@ -1,14 +1,13 @@
 package com.github.michalp2213.GraphCalc.Model;
 
-import java.io.Serializable;
 import java.util.*;
 
 /**
  * Class describing undirected graph. Null as vertex isn't accepted.
  */
 
-public class UndirectedGraph<T> implements Graph<T>, Serializable {
-    protected HashMap<Vertex<T>, HashSet<Edge<T>>> list;
+public class UndirectedGraph implements Graph {
+    private HashMap<Vertex, HashSet<Edge>> list;
 
     /**
      * Basic constructor.
@@ -22,31 +21,31 @@ public class UndirectedGraph<T> implements Graph<T>, Serializable {
      * Copying constructor
      */
 
-    public UndirectedGraph(UndirectedGraph<T> g) {
+    public UndirectedGraph(UndirectedGraph g) {
         if (g == null) throw new NullPointerException();
         list = new HashMap<>(g.list);
     }
 
     /**
-     * Get read-only adjacency list that represents graph.
+     * @return read-only adjacency list that represents graph.
      */
 
-    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList() {
+    public Map<Vertex, ? extends HashSet<Edge>> getAdjacencyList() {
         return Collections.unmodifiableMap(list);
     }
 
-    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getTransposedAdjacencyList() {
+    public Map<Vertex, ? extends HashSet<Edge>> getTransposedAdjacencyList() {
         return Collections.unmodifiableMap(list);
     }
 
     @Override
-    public void addVertex(Vertex<T> v) {
+    public void addVertex(Vertex v) {
         if (v == null) throw new NullPointerException();
         list.putIfAbsent(v, new HashSet<>());
     }
 
     @Override
-    public void addEdge(Edge<T> e) {
+    public void addEdge(Edge e) {
         if (e == null) throw new NullPointerException();
         list.putIfAbsent(e.from, new HashSet<>());
         list.putIfAbsent(e.to, new HashSet<>());
@@ -55,37 +54,32 @@ public class UndirectedGraph<T> implements Graph<T>, Serializable {
     }
 
     @Override
-    public void removeVertex(Vertex<T> v) {
+    public void removeVertex(Vertex v) {
         if (v == null) throw new NullPointerException();
-        v.finishIt();
-        HashSet<Edge<T>> set = list.remove(v);
+        HashSet<Edge> set = list.remove(v);
         if (set == null) return;
-        for (Edge<T> e : set) {
-            e.finishIt();
-            e.transpose().finishIt();
+        for (Edge e : set) {
             list.get(e.to).remove(e.transpose());
         }
     }
 
     @Override
-    public void removeEdge(Edge<T> e) {
+    public void removeEdge(Edge e) {
         if (e == null) throw new NullPointerException();
-        HashSet<Edge<T>> set = list.get(e.from);
+        HashSet<Edge> set = list.get(e.from);
         if (set == null) return;
-        e.finishIt();
         set.remove(e);
-        e.transpose().finishIt();
         list.get(e.to).remove(e.transpose());
     }
 
     @Override
-    public boolean containsVertex(Vertex<T> v) {
+    public boolean containsVertex(Vertex v) {
         return list.containsKey(v);
     }
 
     @Override
-    public boolean containsEdge(Edge<T> e) {
-        HashSet<Edge<T>> set = list.get(e.from);
+    public boolean containsEdge(Edge e) {
+        HashSet<Edge> set = list.get(e.from);
         return set != null && set.contains(e);
     }
 

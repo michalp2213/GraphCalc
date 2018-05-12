@@ -1,15 +1,17 @@
 package com.github.michalp2213.GraphCalc.Model;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 /**
- * Class describing directed graph. Null as vertex isn't accepted.
+ * Class describing directed graph.
  */
 
-public class DirectedGraph<T> implements Graph<T>, Serializable {
-    protected HashMap<Vertex<T>, HashSet<Edge<T>>> list;
-    protected HashMap<Vertex<T>, HashSet<Edge<T>>> transposedList;
+public class DirectedGraph implements Graph {
+    HashMap<Vertex, HashSet<Edge>> list;
+    HashMap<Vertex, HashSet<Edge>> transposedList;
 
     /**
      * Basic constructor.
@@ -24,50 +26,50 @@ public class DirectedGraph<T> implements Graph<T>, Serializable {
      * Copying constructor.
      */
 
-    public DirectedGraph(DirectedGraph<T> g) {
+    public DirectedGraph(DirectedGraph g) {
         if (g == null) throw new NullPointerException();
         list = new HashMap<>(g.list);
         transposedList = new HashMap<>(g.transposedList);
     }
 
     /**
-     * Get read-only adjacency list that represents graph.
+     * @return read-only adjacency list that represents graph.
      */
 
     @Override
-    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getAdjacencyList() {
+    public Map<Vertex, ? extends HashSet<Edge>> getAdjacencyList() {
         return Collections.unmodifiableMap(list);
     }
 
     /**
-     * Get read-only transposed adjacency list that represents graph.
+     * @return read-only transposed adjacency list that represents graph.
      */
 
-    public Map<? extends Vertex<T>, ? extends HashSet<Edge<T>>> getTransposedAdjacencyList() {
+    public Map<Vertex, ? extends HashSet<Edge>> getTransposedAdjacencyList() {
         return Collections.unmodifiableMap(transposedList);
     }
 
     /**
-     * Return new graph that has transposed edges.
+     * @return graph that has transposed edges.
      */
 
-    public DirectedGraph<T> transpose() {
-        DirectedGraph<T> g = new DirectedGraph<>(this);
-        HashMap<Vertex<T>, HashSet<Edge<T>>> temp = g.list;
+    public DirectedGraph transpose() {
+        DirectedGraph g = new DirectedGraph(this);
+        HashMap<Vertex, HashSet<Edge>> temp = g.list;
         g.list = g.transposedList;
         g.transposedList = temp;
         return g;
     }
 
     @Override
-    public void addVertex(Vertex<T> v) {
+    public void addVertex(Vertex v) {
         if (v == null) throw new NullPointerException();
         list.putIfAbsent(v, new HashSet<>());
         transposedList.putIfAbsent(v, new HashSet<>());
     }
 
     @Override
-    public void addEdge(Edge<T> e) {
+    public void addEdge(Edge e) {
         if (e == null) throw new NullPointerException();
         list.putIfAbsent(e.from, new HashSet<>());
         list.putIfAbsent(e.to, new HashSet<>());
@@ -78,40 +80,40 @@ public class DirectedGraph<T> implements Graph<T>, Serializable {
     }
 
     @Override
-    public void removeVertex(Vertex<T> v) {
+    public void removeVertex(Vertex v) {
         if (v == null) throw new NullPointerException();
-        if(transposedList.get(v)!=null)for (Edge<T> e : transposedList.get(v)) {
-            e.finishIt();
-            list.get(e.to).remove(e.transpose());
+        if (transposedList.get(v) != null) {
+            for (Edge e : transposedList.get(v)) {
+                list.get(e.to).remove(e.transpose());
+            }
         }
-        if(list.get(v)!=null)for (Edge<T> e : list.get(v)) {
-            e.finishIt();
-            transposedList.get(e.to).remove(e.transpose());
+        if (list.get(v) != null) {
+            for (Edge e : list.get(v)) {
+                transposedList.get(e.to).remove(e.transpose());
+            }
         }
-        v.finishIt();
         list.remove(v);
         transposedList.remove(v);
     }
 
     @Override
-    public void removeEdge(Edge<T> e) {
+    public void removeEdge(Edge e) {
         if (e == null) throw new NullPointerException();
-        HashSet<Edge<T>> set = list.get(e.from);
+        HashSet<Edge> set = list.get(e.from);
         if (set == null) return;
-        e.finishIt();
         set.remove(e);
         set = transposedList.get(e.to);
         if (set != null) set.remove(e.transpose());
     }
 
     @Override
-    public boolean containsVertex(Vertex<T> v) {
+    public boolean containsVertex(Vertex v) {
         return list.containsKey(v);
     }
 
     @Override
-    public boolean containsEdge(Edge<T> e) {
-        HashSet<Edge<T>> set = list.get(e.from);
+    public boolean containsEdge(Edge e) {
+        HashSet<Edge> set = list.get(e.from);
         return set != null && set.contains(e);
     }
 

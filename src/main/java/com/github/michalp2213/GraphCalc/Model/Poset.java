@@ -7,7 +7,7 @@ import java.util.Set;
  * Class describing poset(partially ordered set). Null as vertex isn't accepted.
  */
 
-public class Poset<T> extends DirectedGraph<T> {
+public class Poset extends DirectedGraph {
 
     /**
      * Basic constructor.
@@ -21,7 +21,7 @@ public class Poset<T> extends DirectedGraph<T> {
      * Copying constructor.
      */
 
-    public Poset(Poset<T> p) {
+    public Poset(Poset p) {
         super(p);
     }
 
@@ -30,7 +30,7 @@ public class Poset<T> extends DirectedGraph<T> {
      */
 
     @Override
-    public void addEdge(Edge<T> e) {
+    public void addEdge(Edge e) {
         if (e == null) throw new NullPointerException();
         if (e.from.equals(e.to) || containsEdge(e)) return;
         if (containsEdge(e.transpose())) throw new IllegalArgumentException();
@@ -45,7 +45,7 @@ public class Poset<T> extends DirectedGraph<T> {
      */
 
     @Override
-    public void removeEdge(Edge<T> e) {
+    public void removeEdge(Edge e) {
         super.removeEdge(e);
     }
 
@@ -54,16 +54,16 @@ public class Poset<T> extends DirectedGraph<T> {
      */
 
     @Override
-    public boolean containsEdge(Edge<T> e) {
+    public boolean containsEdge(Edge e) {
         if (e == null) throw new NullPointerException();
         if (!containsVertex(e.from) || !containsVertex(e.to)) return false;
-        HashMap<Vertex<T>, Boolean> visited = new HashMap<>();
+        HashMap<Vertex, Boolean> visited = new HashMap<>();
         return dfs(e.from, e.to, visited);
     }
 
-    private boolean dfs(Vertex<T> v, Vertex<T> to, HashMap<Vertex<T>, Boolean> visited) {
+    private boolean dfs(Vertex v, Vertex to, HashMap<Vertex, Boolean> visited) {
         visited.put(v, true);
-        for (Edge<T> e : list.get(v)) {
+        for (Edge e : list.get(v)) {
             if (e.to.equals(to)) return true;
             if (!visited.containsKey(e.to)) {
                 boolean res = dfs(e.to, to, visited);
