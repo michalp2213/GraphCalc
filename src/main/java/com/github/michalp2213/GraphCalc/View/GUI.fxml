@@ -65,6 +65,15 @@
                     onMouseClicked="#spreadVerticesPressed"
                     textAlignment="CENTER"/>
 
+            <Button fx:id="runAlgorithmButton"
+                    text="Run&#13;&#10;algorithm"
+                    maxWidth="70"
+                    minWidth="70"
+                    maxHeight="50"
+                    minHeight="50"
+                    onMouseEntered="#showAlgorithmMenu"
+                    onMouseExited="#hideAlgorithmMenu"
+                    textAlignment="CENTER"/>
         </VBox>
 
         <Region VBox.vgrow="ALWAYS"/>
@@ -138,6 +147,35 @@
                 onAction="#saveAsClicked"/>
     </VBox>
 
+    <VBox fx:id="algorithmMenu"
+          AnchorPane.leftAnchor="70"
+          AnchorPane.rightAnchor="140"
+          minHeight="100"
+          minWidth="70"
+          maxHeight="100"
+          maxWidth="70"
+          visible="false"
+          onMouseEntered="#showAlgorithmMenu"
+          onMouseExited="#hideAlgorithmMenu">
+
+        <Button fx:id="runDFSButton"
+                text="DFS"
+                maxWidth="70"
+                minWidth="70"
+                maxHeight="25"
+                minHeight="25"
+                onAction="#runDFSPressed"
+                textAlignment="CENTER"/>
+
+        <Button fx:id="runBFSButton"
+                text="BFS"
+                maxWidth="70"
+                minWidth="70"
+                maxHeight="25"
+                minHeight="25"
+                onAction="#runBFSPressed"
+                textAlignment="CENTER"/>
+    </VBox>
     <Pane fx:id="workspace"
           AnchorPane.topAnchor="0"
           AnchorPane.leftAnchor="70"
