@@ -1,5 +1,6 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -7,7 +8,7 @@ import java.util.Objects;
  * Class describing vertex.
  */
 
-public class Vertex {
+public class Vertex implements Serializable {
     private final int v;
     private HashMap<Class<? extends Attribute>, Attribute> attributes;
 

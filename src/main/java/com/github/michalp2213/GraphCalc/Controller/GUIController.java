@@ -15,7 +15,9 @@ import javafx.stage.FileChooser;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -144,17 +146,64 @@ public class GUIController {
 
     @FXML
     public void openClicked(ActionEvent event) {
-        //TODO
+        file = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
+
+        if (file == null)
+            return;
+
+        try {
+            FileIO.readData r = FileIO.readFromFile(file);
+            graph = r.g;
+            circles = r.circles;
+        } catch (IOException e) {
+            showAlert("Error", e.toString());
+            return;
+        }
+
+        for (Circle c : circles.values()) {
+            c.addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
+            workspace.getChildren().add(c);
+        }
+
+        lines.clear();
+
+        for (Map.Entry<Vertex, ? extends HashSet<Edge>> entry : graph.getAdjacencyList().entrySet()) {
+            for (Edge e : entry.getValue()) {
+
+                if (!lines.keySet().contains(e) && !lines.keySet().contains(e.transpose())) {
+                    Node l = getLine(circles.get(e.from), circles.get(e.to));
+
+                    lines.put(e, l);
+                    l.addEventHandler(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l));
+                    workspace.getChildren().add(l);
+
+                    circles.get(e.from).toFront();
+                    circles.get(e.to).toFront();
+                }
+            }
+        }
     }
 
     @FXML
     public void saveClicked(ActionEvent event) {
-        //TODO
+        if (file == null)
+            saveAsClicked(event);
+
+        try {
+            FileIO.saveToFile(graph, circles, file);
+        } catch (IOException e) {
+            showAlert("Error", e.toString());
+        }
     }
 
     @FXML
     public void saveAsClicked(ActionEvent event) {
-        //TODO
+        file = fileChooser.showSaveDialog(mainFrame.getScene().getWindow());
+
+        if (file == null)
+            return;
+
+        saveClicked(event);
     }
 
     @FXML

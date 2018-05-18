@@ -1,5 +1,6 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -8,7 +9,7 @@ import java.util.Map;
  */
 
 
-public interface Graph {
+public interface Graph extends Serializable {
 
     Map<Vertex, ? extends HashSet<Edge>> getAdjacencyList();
 
