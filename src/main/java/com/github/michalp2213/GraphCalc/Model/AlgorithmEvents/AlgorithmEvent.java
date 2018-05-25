@@ -1,7 +1,13 @@
-package com.github.michalp2213.GraphCalc.Model;
-
-import javafx.scene.Node;
+package com.github.michalp2213.GraphCalc.Model.AlgorithmEvents;
 
 public abstract class AlgorithmEvent {
-    Node eventTarget;
+    private Object eventTarget;
+
+    AlgorithmEvent(Object target){
+        eventTarget = target;
+    }
+
+    public Object getTarget(){
+        return eventTarget;
+    }
 }

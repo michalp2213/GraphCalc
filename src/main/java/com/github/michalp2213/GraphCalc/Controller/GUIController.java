@@ -52,6 +52,10 @@ public class GUIController {
     public Label graphLabel;
     public Label sourceLabel;
     public Label pathLabel;
+    public Button runAlgorithmButton;
+    public VBox algorithmMenu;
+    public Button runDFSButton;
+    public Button runBFSButton;
     private int id = 0;
     private Graph graph = new UndirectedGraph();
     private File file = null;
@@ -68,12 +72,24 @@ public class GUIController {
         fileMenu.setVisible(true);
         fileMenu.toFront();
     }
-
+    
     @FXML
     public void hideFileMenu() {
         fileMenu.setVisible(false);
     }
 
+    @FXML
+    public void showAlgorithmMenu(){
+        AnchorPane.setTopAnchor(algorithmMenu, runAlgorithmButton.localToScene(runAlgorithmButton.getBoundsInLocal()).getMinY());
+        algorithmMenu.setVisible(true);
+        algorithmMenu.toFront();
+    }
+
+    @FXML
+    public void hideAlgorithmMenu(){
+        algorithmMenu.setVisible(false);
+    }
+    
     @FXML
     public void showNewMenu(ActionEvent event) {
         newMenu.setVisible(true);
@@ -236,6 +252,16 @@ public class GUIController {
     @FXML
     public void spreadVerticesPressed(MouseEvent event) {
         spreadVerticesEvenly();
+    }
+
+    @FXML
+    public void runDFSPressed(ActionEvent event){
+        //todo
+    }
+
+    @FXML
+    public void runBFSPressed(ActionEvent event){
+        //todo
     }
 
     @FXML
