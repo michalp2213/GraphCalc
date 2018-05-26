@@ -72,24 +72,24 @@ public class GUIController {
         fileMenu.setVisible(true);
         fileMenu.toFront();
     }
-    
+
     @FXML
     public void hideFileMenu() {
         fileMenu.setVisible(false);
     }
 
     @FXML
-    public void showAlgorithmMenu(){
+    public void showAlgorithmMenu() {
         AnchorPane.setTopAnchor(algorithmMenu, runAlgorithmButton.localToScene(runAlgorithmButton.getBoundsInLocal()).getMinY());
         algorithmMenu.setVisible(true);
         algorithmMenu.toFront();
     }
 
     @FXML
-    public void hideAlgorithmMenu(){
+    public void hideAlgorithmMenu() {
         algorithmMenu.setVisible(false);
     }
-    
+
     @FXML
     public void showNewMenu(ActionEvent event) {
         newMenu.setVisible(true);
@@ -255,12 +255,12 @@ public class GUIController {
     }
 
     @FXML
-    public void runDFSPressed(ActionEvent event){
+    public void runDFSPressed(ActionEvent event) {
         //todo
     }
 
     @FXML
-    public void runBFSPressed(ActionEvent event){
+    public void runBFSPressed(ActionEvent event) {
         //todo
     }
 
@@ -269,9 +269,11 @@ public class GUIController {
         if (addVerticesMode) {
             Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
             if (!containsCircle(c)) {
-                circles.put(getVertex(), c);
+                Vertex v = getVertex();
+                circles.put(v, c);
+                graph.addVertex(v);
                 workspace.getChildren().add(c);
-                c.addEventHandler(MouseEvent.MOUSE_CLICKED,getCircleEventHandler(c));
+                c.addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
             }
         }
     }
@@ -327,6 +329,7 @@ public class GUIController {
         alert.setContentText(message2);
         alert.showAndWait();
     }
+
     @SuppressWarnings("Duplicates")
     private void moveCircle(Circle a, double toX, double toY) {
         Vertex v = getVertex(a);
@@ -334,7 +337,7 @@ public class GUIController {
         for (Edge e : graph.getAdjacencyList().get(v)) {
             if (graph.getClass().equals(UndirectedGraph.class)) {
                 Line l = (Line) lines.get(e);
-                if(l == null) l = (Line) lines.get(e.transpose());
+                if (l == null) l = (Line) lines.get(e.transpose());
                 Line temp;
                 if (e.to.equals(v)) {
                     if (e.from.equals(v)) {
@@ -417,7 +420,7 @@ public class GUIController {
         return event -> {
             if (removeObjectsMode) {
                 Edge e = getEdge(l);
-                if(e!=null){
+                if (e != null) {
                     workspace.getChildren().remove(l);
                     graph.removeEdge(e);
                     lines.remove(e);
@@ -495,7 +498,7 @@ public class GUIController {
                 for (int j = 0; j < k; j++) {
                     int a = sc.nextInt();
                     Node l = getLine(arr[i], arr[a - 1]);
-                    Edge edge = getEdge(arr1[i], arr1[a-1]);
+                    Edge edge = getEdge(arr1[i], arr1[a - 1]);
                     try {
                         putEdge(edge, l);
                     } catch (IllegalArgumentException exception) {
@@ -524,7 +527,7 @@ public class GUIController {
                 int a = sc.nextInt();
                 int b = sc.nextInt();
                 Node l = getLine(arr[a - 1], arr[b - 1]);
-                Edge edge = getEdge(arr1[a-1], arr1[b-1]);
+                Edge edge = getEdge(arr1[a - 1], arr1[b - 1]);
                 try {
                     putEdge(edge, l);
                 } catch (IllegalArgumentException exception) {
@@ -549,7 +552,7 @@ public class GUIController {
         return false;
     }
 
-    private void removeLine(Edge e){
+    private void removeLine(Edge e) {
         Node l = lines.get(e);
         lines.remove(e);
         workspace.getChildren().remove(l);
@@ -560,7 +563,7 @@ public class GUIController {
 
     private void removeCircle(Circle a) {
         Vertex v = getVertex(a);
-        if(v==null) return;
+        if (v == null) return;
         for (Edge e : graph.getAdjacencyList().get(v)) {
             removeLine(e);
         }
@@ -572,7 +575,7 @@ public class GUIController {
         graph.removeVertex(v);
     }
 
-    private Vertex getVertex(Circle a){
+    private Vertex getVertex(Circle a) {
         Vertex v = null;
         for (Map.Entry<Vertex, Circle> m : circles.entrySet()) {
             if (m.getValue().equals(a)) {
@@ -583,7 +586,7 @@ public class GUIController {
         return v;
     }
 
-    private Edge getEdge(Node l){
+    private Edge getEdge(Node l) {
         Edge e = null;
         for (Map.Entry<Edge, Node> m : lines.entrySet()) {
             if (m.getValue().equals(l)) {
@@ -598,7 +601,7 @@ public class GUIController {
      * @return vertex with desired attributes;
      */
 
-    private Vertex getVertex(){
+    private Vertex getVertex() {
         return new Vertex(id++);
     }
 
@@ -606,12 +609,12 @@ public class GUIController {
      * @return edge with desired attributes.
      */
 
-    private Edge getEdge(Vertex v1, Vertex v2){
+    private Edge getEdge(Vertex v1, Vertex v2) {
         return new Edge(v1, v2);
     }
 
-    private void putEdge(Edge edge, Node l){
-        if (!graph.containsEdge(edge)){
+    private void putEdge(Edge edge, Node l) {
+        if (!graph.containsEdge(edge)) {
             graph.addEdge(edge);
             lines.put(edge, l);
             l.addEventHandler(MouseEvent.MOUSE_CLICKED, getLineEventHandler(l));
@@ -620,7 +623,7 @@ public class GUIController {
         }
     }
 
-    private void reset(){
+    private void reset() {
         workspace.getChildren().clear();
         graph = new UndirectedGraph();
         id = 0;
@@ -628,9 +631,9 @@ public class GUIController {
         lines.clear();
     }
 
-    private void prepareArrays(Circle arr[], Vertex arr1[], int n){
+    private void prepareArrays(Circle arr[], Vertex arr1[], int n) {
         for (int i = 0; i < n; i++) {
-            arr[i] = new Circle(0, i+1, RADIUS);
+            arr[i] = new Circle(0, i + 1, RADIUS);
             arr[i].addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
             Vertex v = getVertex();
             arr1[i] = v;
