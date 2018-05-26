@@ -1,7 +1,6 @@
 package com.github.michalp2213.GraphCalc.Model.Algorithms;
 
 import com.github.michalp2213.GraphCalc.Model.AlgorithmEvents.*;
-import com.github.michalp2213.GraphCalc.Model.Vertex;
 
 import java.util.ArrayList;
 
