@@ -125,4 +125,8 @@ public class DirectedLine extends Group {
         endArrow.setFill(value);
         middleArrow.setFill(value);
     }
+
+    public final Paint getStroke(){
+        return line.getStroke();
+    }
 }

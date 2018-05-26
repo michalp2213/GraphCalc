@@ -1,5 +1,7 @@
 package com.github.michalp2213.GraphCalc.Controller;
 
+import com.github.michalp2213.GraphCalc.Model.AlgorithmEvents.*;
+import com.github.michalp2213.GraphCalc.Model.Algorithms.*;
 import com.github.michalp2213.GraphCalc.Model.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -9,6 +11,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.FileChooser;
@@ -16,10 +19,8 @@ import javafx.stage.FileChooser;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 
 public class GUIController {
@@ -64,8 +65,16 @@ public class GUIController {
     private Boolean addVerticesMode = false;
     private Boolean addEdgesMode = false;
     private Boolean removeObjectsMode = false;
+    private Boolean algorithmMode = false;
     private HashMap<Vertex, Circle> circles = new HashMap<>();
     private HashMap<Edge, Node> lines = new HashMap<>();
+    private ArrayList<AlgorithmEvent> events;
+    private CountDownLatch latch;
+    private ListIterator<AlgorithmEvent> it;
+    private Vertex v;
+    private Stack<Runnable> changes = new Stack<>();
+    private ArrayList<TouchEvent> touched = new ArrayList<>();
+    private VisitEvent visited;
 
     @FXML
     public void showFileMenu() {
@@ -80,6 +89,7 @@ public class GUIController {
 
     @FXML
     public void showAlgorithmMenu() {
+        changeMode(false, false, false);
         AnchorPane.setTopAnchor(algorithmMenu, runAlgorithmButton.localToScene(runAlgorithmButton.getBoundsInLocal()).getMinY());
         algorithmMenu.setVisible(true);
         algorithmMenu.toFront();
@@ -251,12 +261,26 @@ public class GUIController {
 
     @FXML
     public void spreadVerticesPressed(MouseEvent event) {
+        changeMode(false, false, false);
         spreadVerticesEvenly();
     }
 
     @FXML
     public void runDFSPressed(ActionEvent event) {
-        //todo
+        algorithmMode = true;
+        latch = new CountDownLatch(1);
+        new Thread(() -> {
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            events = DFS.run(graph, v);
+            algorithmMode = false;
+            it = events.listIterator();
+            runAlgorithm();
+
+        }).start();
     }
 
     @FXML
@@ -453,6 +477,9 @@ public class GUIController {
                     c1 = null;
                     c2 = null;
                 }
+            } else if (algorithmMode) {
+                v = getVertex(c);
+                latch.countDown();
             }
         };
     }
@@ -640,6 +667,97 @@ public class GUIController {
             graph.addVertex(v);
             circles.put(v, arr[i]);
             workspace.getChildren().add(arr[i]);
+        }
+    }
+
+    private void setColor(Object o, Paint p) {
+        if (o.getClass() == Vertex.class) {
+            Circle c = circles.get(o);
+            c.setFill(p);
+        } else if (o.getClass() == Edge.class) {
+            Node n = lines.get(o) == null ? lines.get(((Edge) o).transpose()) : lines.get(o);
+            if (n.getClass() == Line.class) {
+                ((Line) n).setStroke(p);
+            } else {
+                ((DirectedLine) n).setStroke(p);
+            }
+        }
+    }
+
+    private Paint getColor(Object o) {
+        if (o.getClass() == Vertex.class) {
+            Circle c = circles.get(o);
+            return c.getFill();
+        } else if (o.getClass() == Edge.class) {
+            Node n = lines.get(o) == null ? lines.get(((Edge) o).transpose()) : lines.get(o);
+            if (n.getClass() == Line.class) {
+                return ((Line) n).getStroke();
+            } else {
+                return ((DirectedLine) n).getStroke();
+            }
+        }
+        return Color.BLACK;
+    }
+
+    private void runAlgorithm() {
+        while (it.hasNext()) {
+            nextStep();
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        for (Vertex v : circles.keySet()) {
+            setColor(v, Color.BLACK);
+        }
+        for (Edge e : lines.keySet()) {
+            setColor(e, Color.BLACK);
+        }
+        changes.clear();
+    }
+
+    private void nextStep() {
+        AlgorithmEvent event = it.next();
+        if (event.getClass() == TouchEvent.class) {
+            touched.add((TouchEvent) event);
+            Paint p = getColor(event.getTarget());
+            changes.push(() -> {
+                touched.remove(event);
+                setColor(event.getTarget(), p);
+            });
+            setColor(event.getTarget(), Color.DARKRED);
+        } else if (event.getClass() == VisitEvent.class) {
+            ArrayList<Paint> list = new ArrayList<>();
+            for (TouchEvent e : touched) {
+                list.add(getColor(e));
+                setColor(e.getTarget(), Color.BLACK);
+            }
+            Paint p = getColor(event.getTarget());
+            Paint p1 = visited == null ? null : getColor(visited.getTarget());
+            VisitEvent prev = visited;
+            if (visited != null)
+                setColor(visited.getTarget(), Color.BLACK);
+            ArrayList<TouchEvent> temp = touched;
+            changes.push(() -> {
+                touched = temp;
+                for (int i = 0; i < touched.size(); i++) {
+                    setColor(touched.get(i), list.get(i));
+                }
+                setColor(event.getTarget(), p);
+                visited = prev;
+                if (prev != null)
+                    setColor(visited.getTarget(), p1);
+            });
+            setColor(event.getTarget(), Color.CRIMSON);
+            visited = (VisitEvent) event;
+        }
+    }
+
+    private void previousStep() {
+        if (it.hasPrevious()) {
+            it.previous();
+            changes.pop().run();
         }
     }
 }
