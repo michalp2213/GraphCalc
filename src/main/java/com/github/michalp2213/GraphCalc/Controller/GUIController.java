@@ -251,10 +251,9 @@ public class GUIController {
     }
 
     private Node getLine(Circle a, Circle b) {
-        Node line;
         double startX = a.getCenterX(), startY = a.getCenterY(), endX = b.getCenterX(), endY = b.getCenterY();
-        double vecLength = Math.sqrt((a.getCenterX() + b.getCenterX()) * (a.getCenterX() + b.getCenterX()) +
-                (a.getCenterY() + b.getCenterY()) * (a.getCenterY() + b.getCenterY()));
+        double vecLength = Math.sqrt((a.getCenterX() - b.getCenterX()) * (a.getCenterX() - b.getCenterX()) +
+                (a.getCenterY() - b.getCenterY()) * (a.getCenterY() - b.getCenterY()));
         if (vecLength != 0) {
             double unitVecX = (b.getCenterX() - a.getCenterX()) / vecLength;
             double unitVecY = (b.getCenterY() - a.getCenterY()) / vecLength;
@@ -267,11 +266,10 @@ public class GUIController {
             endY = midY + distFromMid * unitVecY;
         }
         if (graph.getClass().equals(UndirectedGraph.class)) {
-            line = new Line(startX, startY, endX, endY);
+            return new Line(startX, startY, endX, endY);
         } else {
-            line = new DirectedLine(startX, startY, endX, endY);
+            return new DirectedLine(startX, startY, endX, endY);
         }
-        return line;
     }
 
     private void showAlert(String message, String message2) {

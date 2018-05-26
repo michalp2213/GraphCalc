@@ -1,6 +1,7 @@
 package com.github.michalp2213.GraphCalc.Model;
 
 import javafx.scene.Group;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.transform.Rotate;
@@ -117,5 +118,11 @@ public class DirectedLine extends Group {
     public void setEndY(double value){
         line.setEndY(value);
         fixArrows();
+    }
+
+    public final void setStroke(Paint value) {
+        line.setStroke(value);
+        endArrow.setFill(value);
+        middleArrow.setFill(value);
     }
 }
