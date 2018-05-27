@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 
 import java.io.File;
@@ -58,11 +59,14 @@ public class GUIController {
     public VBox algorithmMenu;
     public Button runDFSButton;
     public Button runBFSButton;
-    public VBox algorithmControlButtons;
+    public VBox algorithmControlMenu;
     public Button prevStepButton;
     public Button nextStepButton;
-    public Button pauseAndResumeButton;
     public HBox previousNextButtons;
+    public Button runPauseAndResumeButton;
+    public TextField algorithmDelayField;
+    public Button cancelAlgorithmButton;
+    public Label delayLabel;
     private int id = 0;
     private Graph graph = new UndirectedGraph();
     private File file = null;
@@ -504,6 +508,8 @@ public class GUIController {
                 }
             } else if (algorithmMode) {
                 v = getVertex(c);
+                algorithmControlMenu.setVisible(true);
+                runPauseAndResumeButton.setText("Run");
                 latch.countDown();
             }
         };
@@ -725,10 +731,6 @@ public class GUIController {
     }
 
     private void runAlgorithm() {
-        algorithmControlButtons.setVisible(true);
-        previousNextButtons.setVisible(false);
-        pauseAndResumeButton.setText("Pause");
-        algorithmPaused = false;
         while (it.hasNext()) {
             nextStep();
             try {
@@ -744,7 +746,7 @@ public class GUIController {
             setColor(e, Color.BLACK);
         }
         changes.clear();
-        algorithmControlButtons.setVisible(false);
+        algorithmControlMenu.setVisible(false);
     }
 
     @FXML
@@ -800,19 +802,23 @@ public class GUIController {
     private void resumeAlgorithm() {
         //todo
     }
+
     @FXML
-    private void pauseAndResumeButtonPressed() {
+    private void runPauseAndResumeButtonPressed() {
         if (!algorithmPaused) {
             pauseAlgorithm();
             algorithmPaused = true;
-            pauseAndResumeButton.setText("Resume");
-            previousNextButtons.setVisible(true);
+            runPauseAndResumeButton.setText("Resume");
         }
         else {
             resumeAlgorithm();
             algorithmPaused = false;
-            pauseAndResumeButton.setText("Pause");
-            previousNextButtons.setVisible(false);
+            runPauseAndResumeButton.setText("Pause");
         }
+    }
+
+    @FXML
+    private void cancelAlgorithmButtonPressed() {
+        //todo
     }
 }

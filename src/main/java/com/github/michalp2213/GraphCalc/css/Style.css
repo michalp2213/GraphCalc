@@ -32,3 +32,11 @@
 #newMenuPath {
     -fx-padding: 4px 4px 4px 4px;
 }
+
+#delayLabel {
+    -fx-padding: 2px 0px 0px 3px;
+}
+
+#algorithmControlMenu {
+    -fx-background-color:lightgray;
+}

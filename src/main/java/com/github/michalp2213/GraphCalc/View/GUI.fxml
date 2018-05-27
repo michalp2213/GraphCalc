@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.text.Text?>
 <AnchorPane fx:id="mainFrame"
             xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -238,16 +239,15 @@
         </HBox>
     </GridPane>
 
-    <VBox fx:id="algorithmControlButtons"
+    <VBox fx:id="algorithmControlMenu"
           AnchorPane.leftAnchor="70"
           AnchorPane.bottomAnchor="0"
           maxWidth="140"
           minWidth="140"
-          maxHeight="50"
-          minHeight="50"
+          maxHeight="100"
+          minHeight="100"
           visible="false">
-        <HBox fx:id="previousNextButtons"
-              visible="false">
+        <HBox fx:id="previousNextButtons">
             <Button fx:id="prevStepButton"
                     text="Previous step"
                     maxWidth="70"
@@ -267,13 +267,32 @@
                     textAlignment="CENTER"/>
         </HBox>
 
-        <Button fx:id="pauseAndResumeButton"
-                text="Pause"
+        <Button fx:id="runPauseAndResumeButton"
+                text="Run"
                 maxWidth="140"
                 minWidth="140"
                 maxHeight="25"
                 minHeight="25"
-                onAction="#pauseAndResumeButtonPressed"
+                onAction="#runPauseAndResumeButtonPressed"
+                textAlignment="CENTER"/>
+
+        <HBox>
+            <Label fx:id="delayLabel"
+                   minWidth="40">
+                Delay:
+            </Label>
+
+            <TextField fx:id="algorithmDelayField"/>
+
+        </HBox>
+
+        <Button fx:id="cancelAlgorithmButton"
+                text="Cancel"
+                maxWidth="140"
+                minWidth="140"
+                maxHeight="25"
+                minHeight="25"
+                onAction="#cancelAlgorithmButtonPressed"
                 textAlignment="CENTER"/>
 
     </VBox>
