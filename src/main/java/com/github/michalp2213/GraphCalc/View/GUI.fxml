@@ -252,11 +252,14 @@
               GridPane.columnIndex="0"
               GridPane.rowIndex="1"
               GridPane.columnSpan="2">
+
             <Label fx:id="pathLabel">
                 Path:
             </Label>
+
             <TextField fx:id="pathField"
-                       minWidth="285"/>
+                       minWidth="220"/>
+
             <Button fx:id="openGraphButton"
                     text="Open"
                     maxWidth="70"
@@ -264,6 +267,9 @@
                     maxHeight="25"
                     minHeight="25"
                     onAction="#openGraphClicked"/>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
         </HBox>
         <HBox GridPane.columnIndex="1"
               GridPane.rowIndex="2"
