@@ -16,12 +16,14 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.util.Pair;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Function;
 
 
 public class GUIController {
@@ -67,6 +69,9 @@ public class GUIController {
     public TextField algorithmDelayField;
     public Button cancelAlgorithmButton;
     public Label delayLabel;
+    public VBox spreadMenu;
+    public Button spreadEvenlyButton;
+    public Button spreadFRButton;
     private int id = 0;
     private Graph graph = new UndirectedGraph();
     private File file = null;
@@ -108,6 +113,30 @@ public class GUIController {
     @FXML
     public void hideAlgorithmMenu() {
         algorithmMenu.setVisible(false);
+    }
+
+    @FXML
+    public void showSpreadMenu() {
+        AnchorPane.setTopAnchor(spreadMenu, spreadVerticesButton.localToScene(spreadVerticesButton.getBoundsInLocal()).getMinY());
+        spreadMenu.setVisible(true);
+        spreadMenu.toFront();
+    }
+
+    @FXML
+    public void hideSpreadMenu() {
+        spreadMenu.setVisible(false);
+    }
+
+    @FXML
+    public void spreadVerticesEvenlyPressed() {
+        spreadVerticesEvenly();
+        hideSpreadMenu();
+    }
+
+    @FXML
+    public void spreadVerticesFRPressed() {
+        spreadVerticesFR();
+        hideSpreadMenu();
     }
 
     @FXML
@@ -165,7 +194,7 @@ public class GUIController {
                 graphFromEdgeList(pathField.getText());
                 break;
         }
-        spreadVerticesEvenly();
+        spreadVerticesFR();
         newMenuExit(event);
     }
 
@@ -267,12 +296,6 @@ public class GUIController {
         if (removeObjectsMode) {
             changeMode(true, true, false);
         }
-    }
-
-    @FXML
-    public void spreadVerticesPressed(MouseEvent event) {
-        changeMode(false, false, false);
-        spreadVerticesEvenly();
     }
 
     @FXML
@@ -446,6 +469,10 @@ public class GUIController {
         a.setCenterY(toY);
     }
 
+    /*
+    ** BEGIN VERTEX SPREAD ALGORITHMS
+     */
+
     private void spreadVerticesEvenly() {
         if (graph.getAdjacencyList().keySet().size() != 0) {
             double midX = workspace.getWidth() / 2;
@@ -468,6 +495,189 @@ public class GUIController {
             }
         }
     }
+
+    private void spreadVerticesFR() {
+        spreadVerticesEvenly();
+        if (graph.getAdjacencyList().keySet().size() < 2){
+            return;
+        }
+        double W = workspace.getWidth(), L = workspace.getHeight();
+        double area = W * L;
+        double k = Math.sqrt(area/graph.getAdjacencyList().keySet().size());
+        int iterations = 10;
+        double t = (W+L)/20;
+
+        double fAttScalar = 1.0;
+        //double fRepScalar = 1.0/graph.getAdjacencyList().keySet().size();
+        double fRepScalar = 5.0;
+        Function<Double, Double> fAtt = x -> ((x*x)/k)*fAttScalar;
+        Function<Double, Double> fRep = x -> ((k*k)/(x*x))*fRepScalar;
+        Function<Double, Double> cool = x -> x - (W+L)/(40*iterations);
+
+        Map<Vertex, Pair<Double, Double>> pos = new HashMap<>();
+        for (Vertex v : graph.getAdjacencyList().keySet()) {
+            pos.put(v, new Pair<>(circles.get(v).getCenterX(), circles.get(v).getCenterY()));
+        }
+        for (int i = 0; i < iterations; i++) {
+            Map<Vertex, Pair<Double, Double>> disp = new HashMap<>();
+            for (Vertex v : graph.getAdjacencyList().keySet()) {
+                disp.put(v, new Pair<>(new Double(0), new Double(0)));
+                for (Vertex u : graph.getAdjacencyList().keySet()) {
+                    if (!u.equals(v)) {
+                        Pair<Double, Double> diff = new Pair<>(
+                                pos.get(v).getKey() - pos.get(u).getKey(),
+                                pos.get(v).getValue() - pos.get(u).getValue());
+                        double diffVal = Math.sqrt(
+                                diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        disp.put(v, new Pair<>(
+                                disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
+                                disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                        ));
+                    }
+                }
+                Pair<Double, Double> diff = new Pair<>(
+                        pos.get(v).getKey(),
+                        pos.get(v).getValue() - L/2);
+                double diffVal = Math.sqrt(
+                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                disp.put(v, new Pair<>(
+                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                ));
+                diff = new Pair<>(
+                        pos.get(v).getKey() - W/2,
+                        pos.get(v).getValue());
+                diffVal = Math.sqrt(
+                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                disp.put(v, new Pair<>(
+                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                ));
+                diff = new Pair<>(
+                        pos.get(v).getKey() - W,
+                        pos.get(v).getValue() - L/2);
+                diffVal = Math.sqrt(
+                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                disp.put(v, new Pair<>(
+                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                ));
+                diff = new Pair<>(
+                        pos.get(v).getKey() - W/2,
+                        pos.get(v).getValue() - L);
+                diffVal = Math.sqrt(
+                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                disp.put(v, new Pair<>(
+                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                ));
+                diff = new Pair<>(
+                        pos.get(v).getKey(),
+                        pos.get(v).getValue());
+                diffVal = Math.sqrt(
+                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                disp.put(v, new Pair<>(
+                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                ));
+                diff = new Pair<>(
+                        pos.get(v).getKey() - W,
+                        pos.get(v).getValue());
+                diffVal = Math.sqrt(
+                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                disp.put(v, new Pair<>(
+                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                ));
+                diff = new Pair<>(
+                        pos.get(v).getKey() - W,
+                        pos.get(v).getValue() - L);
+                diffVal = Math.sqrt(
+                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                disp.put(v, new Pair<>(
+                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                ));
+                diff = new Pair<>(
+                        pos.get(v).getKey(),
+                        pos.get(v).getValue() - L);
+                diffVal = Math.sqrt(
+                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                disp.put(v, new Pair<>(
+                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                ));
+            }
+            if (!graph.getClass().equals(UndirectedGraph.class)) {
+                for (Vertex v : graph.getAdjacencyList().keySet()) {
+                    for (Edge e : graph.getAdjacencyList().get(v)) {
+                        Pair<Double, Double> diff = new Pair<>(
+                                pos.get(e.to).getKey() - pos.get(e.from).getKey(),
+                                pos.get(e.to).getValue() - pos.get(e.from).getValue()
+                        );
+                        double diffVal = Math.sqrt(
+                                diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        disp.put(e.from, new Pair<>(
+                                disp.get(e.from).getKey() + (diff.getKey()/diffVal)*fAtt.apply(diffVal),
+                                disp.get(e.from).getValue() + (diff.getValue()/diffVal)*fAtt.apply(diffVal)
+                        ));
+                        disp.put(e.to, new Pair<>(
+                                disp.get(e.to).getKey() - diff.getKey()*(fAtt.apply(diffVal)/diffVal),
+                                disp.get(e.to).getValue() - diff.getValue()*(fAtt.apply(diffVal)/diffVal)
+                        ));
+                    }
+                }
+            } else {
+                Set<Vertex> visited = new HashSet<>();
+                for (Vertex v : graph.getAdjacencyList().keySet()) {
+                    visited.add(v);
+                    for (Edge e : graph.getAdjacencyList().get(v)) {
+                        if (visited.contains(e.to)) {
+                            continue;
+                        }
+                        Pair<Double, Double> diff = new Pair<>(
+                                pos.get(e.to).getKey() - pos.get(e.from).getKey(),
+                                pos.get(e.to).getValue() - pos.get(e.from).getValue()
+                        );
+                        double diffVal = Math.sqrt(
+                                diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        disp.put(e.to, new Pair<>(
+                                disp.get(e.to).getKey() - (diff.getKey()/diffVal)*fAtt.apply(diffVal),
+                                disp.get(e.to).getValue() - (diff.getValue()/diffVal)*fAtt.apply(diffVal)
+                        ));
+                        disp.put(e.from, new Pair<>(
+                                disp.get(e.from).getKey() + (diff.getKey()/diffVal)*fAtt.apply(diffVal),
+                                disp.get(e.from).getValue() + (diff.getValue()/diffVal)*fAtt.apply(diffVal)
+                        ));
+                    }
+                }
+            }
+            for (Vertex v : graph.getAdjacencyList().keySet()) {
+                double dispVal = Math.sqrt(
+                        disp.get(v).getKey() * disp.get(v).getKey() + disp.get(v).getValue() * disp.get(v).getValue());
+                pos.put(v, new Pair<>(
+                        pos.get(v).getKey() + disp.get(v).getKey() * (Math.min(dispVal, t)/dispVal),
+                        pos.get(v).getValue() + disp.get(v).getValue() * (Math.min(dispVal, t)/dispVal)
+                ));
+                pos.put(v, new Pair<>(
+                        Math.min((9*W)/10, Math.max(W/10, pos.get(v).getKey())),
+                        pos.get(v).getValue()
+                ));
+                pos.put(v, new Pair<>(
+                        pos.get(v).getKey(),
+                        Math.min((9*L)/10, Math.max(L/10, pos.get(v).getValue()))
+                ));
+            }
+            t = cool.apply(t);
+        }
+        for (Map.Entry<Vertex, Pair<Double, Double>> e : pos.entrySet()) {
+            moveCircle(circles.get(e.getKey()), e.getValue().getKey(), e.getValue().getValue());
+        }
+    }
+
+    /*
+     ** END VERTEX SPREAD ALGORITHMS
+     */
 
     private EventHandler<MouseEvent> getLineEventHandler(Node l) {
         return event -> {
