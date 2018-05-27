@@ -278,8 +278,9 @@ public class GUIController {
     @FXML
     public void runDFSPressed(ActionEvent event) {
         hideAlgorithmMenu();
-        changeMode(false, false, false);
+        changeMode(true, true, true);
         algorithmMode = true;
+        changeMode(false, runAlgorithmButton);
         latch = new CountDownLatch(1);
         new Thread(() -> {
             try {
@@ -290,16 +291,18 @@ public class GUIController {
             events = DFS.run(graph, v);
             algorithmMode = false;
             it = events.listIterator();
-            runAlgorithm();
+            changeMode(true, runAlgorithmButton);
+            Thread.yield();
         }).start();
     }
 
     @FXML
     public void runBFSPressed(ActionEvent event) {
         hideAlgorithmMenu();
-        changeMode(false, false, false);
+        changeMode(true, true, true);
         algorithmMode = true;
         latch = new CountDownLatch(1);
+        changeMode(false, runAlgorithmButton);
         new Thread(() -> {
             try {
                 latch.await();
@@ -309,7 +312,8 @@ public class GUIController {
             events = BFS.run(graph, v);
             algorithmMode = false;
             it = events.listIterator();
-            runAlgorithm();
+            changeMode(true, runAlgorithmButton);
+            Thread.yield();
         }).start();
     }
 
@@ -739,51 +743,48 @@ public class GUIController {
                 e.printStackTrace();
             }
         }
-        for (Vertex v : circles.keySet()) {
-            setColor(v, Color.BLACK);
-        }
-        for (Edge e : lines.keySet()) {
-            setColor(e, Color.BLACK);
-        }
+        resetColoring();
         changes.clear();
         algorithmControlMenu.setVisible(false);
     }
 
     @FXML
     private void nextStep() {
-        AlgorithmEvent event = it.next();
-        if (event.getClass() == TouchEvent.class) {
-            touched.add((TouchEvent) event);
-            Paint p = getColor(event.getTarget());
-            changes.push(() -> {
-                touched.remove(event);
-                setColor(event.getTarget(), p);
-            });
-            setColor(event.getTarget(), Color.GREEN);
-        } else if (event.getClass() == VisitEvent.class) {
-            ArrayList<Paint> list = new ArrayList<>();
-            for (TouchEvent e : touched) {
-                list.add(getColor(e));
-                setColor(e.getTarget(), Color.BLACK);
-            }
-            Paint p = getColor(event.getTarget());
-            Paint p1 = visited == null ? null : getColor(visited.getTarget());
-            VisitEvent prev = visited;
-            if (visited != null)
-                setColor(visited.getTarget(), Color.BLACK);
-            ArrayList<TouchEvent> temp = touched;
-            changes.push(() -> {
-                touched = temp;
-                for (int i = 0; i < touched.size(); i++) {
-                    setColor(touched.get(i), list.get(i));
+        if(it.hasNext()) {
+            AlgorithmEvent event = it.next();
+            if (event.getClass() == TouchEvent.class) {
+                touched.add((TouchEvent) event);
+                Paint p = getColor(event.getTarget());
+                changes.push(() -> {
+                    touched.remove(event);
+                    setColor(event.getTarget(), p);
+                });
+                setColor(event.getTarget(), Color.GREEN);
+            } else if (event.getClass() == VisitEvent.class) {
+                ArrayList<Paint> list = new ArrayList<>();
+                for (TouchEvent e : touched) {
+                    list.add(getColor(e.getTarget()));
+                    setColor(e.getTarget(), Color.BLACK);
                 }
-                setColor(event.getTarget(), p);
-                visited = prev;
-                if (prev != null)
-                    setColor(visited.getTarget(), p1);
-            });
-            setColor(event.getTarget(), Color.CRIMSON);
-            visited = (VisitEvent) event;
+                Paint p = getColor(event.getTarget());
+                Paint p1 = visited == null ? null : getColor(visited.getTarget());
+                VisitEvent prev = visited;
+                if (visited != null)
+                    setColor(visited.getTarget(), Color.BLACK);
+                ArrayList<TouchEvent> temp = touched;
+                changes.push(() -> {
+                    touched = temp;
+                    for (int i = 0; i < touched.size(); i++) {
+                        setColor(touched.get(i).getTarget(), list.get(i));
+                    }
+                    setColor(event.getTarget(), p);
+                    visited = prev;
+                    if (prev != null)
+                        setColor(visited.getTarget(), p1);
+                });
+                setColor(event.getTarget(), Color.CRIMSON);
+                visited = (VisitEvent) event;
+            }
         }
     }
 
@@ -819,6 +820,17 @@ public class GUIController {
 
     @FXML
     private void cancelAlgorithmButtonPressed() {
-        //todo
+        resetColoring();
+        changes.clear();
+        algorithmControlMenu.setVisible(false);
+    }
+
+    private void resetColoring(){
+        for (Vertex v : circles.keySet()) {
+            setColor(v, Color.BLACK);
+        }
+        for (Edge e : lines.keySet()) {
+            setColor(e, Color.BLACK);
+        }
     }
 }
