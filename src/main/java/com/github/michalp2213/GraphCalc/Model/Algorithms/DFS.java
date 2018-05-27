@@ -20,11 +20,11 @@ public class DFS extends GraphAlgorithm{
     }
 
     private static void runDFS(Graph g, Vertex curr){
+        visited.add(curr);
         addEvent(new VisitEvent(curr));
         for (Edge e : g.getAdjacencyList().get(curr)){
             addEvent(new TouchEvent(e));
             if (!visited.contains(e.to)){
-                visited.add(e.to);
                 runDFS(g, e.to);
             }
         }
