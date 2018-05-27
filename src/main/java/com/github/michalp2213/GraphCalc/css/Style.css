@@ -1,3 +1,8 @@
+.Line {
+    -fx-stroke-width:4;
+    -fx-stroke:orange;
+}
+
 .actionButton {
     -fx-background-color:darkgray;
 }

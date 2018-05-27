@@ -24,7 +24,8 @@ import java.util.concurrent.CountDownLatch;
 
 
 public class GUIController {
-    private static final int RADIUS = 5;
+    private static final int RADIUS = 6;
+    private static final double WIDTH = 2;
     public Button fileButton;
     public Button addVerticesButton;
     public Button addEdgesButton;
@@ -89,7 +90,6 @@ public class GUIController {
 
     @FXML
     public void showAlgorithmMenu() {
-        changeMode(false, false, false);
         AnchorPane.setTopAnchor(algorithmMenu, runAlgorithmButton.localToScene(runAlgorithmButton.getBoundsInLocal()).getMinY());
         algorithmMenu.setVisible(true);
         algorithmMenu.toFront();
@@ -267,6 +267,8 @@ public class GUIController {
 
     @FXML
     public void runDFSPressed(ActionEvent event) {
+        hideAlgorithmMenu();
+        changeMode(false, false, false);
         algorithmMode = true;
         latch = new CountDownLatch(1);
         new Thread(() -> {
@@ -279,13 +281,26 @@ public class GUIController {
             algorithmMode = false;
             it = events.listIterator();
             runAlgorithm();
-
         }).start();
     }
 
     @FXML
     public void runBFSPressed(ActionEvent event) {
-        //todo
+        hideAlgorithmMenu();
+        changeMode(false, false, false);
+        algorithmMode = true;
+        latch = new CountDownLatch(1);
+        new Thread(() -> {
+            try {
+                latch.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            events = BFS.run(graph, v);
+            algorithmMode = false;
+            it = events.listIterator();
+            runAlgorithm();
+        }).start();
     }
 
     @FXML
@@ -341,9 +356,13 @@ public class GUIController {
             endY = midY + distFromMid * unitVecY;
         }
         if (graph.getClass().equals(UndirectedGraph.class)) {
-            return new Line(startX, startY, endX, endY);
+            Line l = new Line(startX, startY, endX, endY);
+            l.setStrokeWidth(WIDTH);
+            return l;
         } else {
-            return new DirectedLine(startX, startY, endX, endY);
+            DirectedLine l = new DirectedLine(startX, startY, endX, endY);
+            l.setStrokeWidth(WIDTH);
+            return l;
         }
     }
 
@@ -726,7 +745,7 @@ public class GUIController {
                 touched.remove(event);
                 setColor(event.getTarget(), p);
             });
-            setColor(event.getTarget(), Color.DARKRED);
+            setColor(event.getTarget(), Color.GREEN);
         } else if (event.getClass() == VisitEvent.class) {
             ArrayList<Paint> list = new ArrayList<>();
             for (TouchEvent e : touched) {
