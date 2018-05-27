@@ -171,6 +171,7 @@ public class GUIController {
     @FXML
     public void openGraphClicked(ActionEvent event){
         File f = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
+        if(f==null) return;
         pathField.setText(f.getAbsolutePath());
     }
 
@@ -303,7 +304,6 @@ public class GUIController {
 
     @FXML
     public void removeObjects(MouseEvent mouseEvent) {
-        openClicked(new ActionEvent());
         changeMode(removeObjectsMode, removeObjectsButton);
         removeObjectsMode = !removeObjectsMode;
         if (removeObjectsMode) {
@@ -996,7 +996,7 @@ public class GUIController {
                 VisitEvent prev = visited;
                 if (visited != null)
                     setColor(visited.getTarget(), Color.BLACK);
-                ArrayList<TouchEvent> temp = touched;
+                ArrayList<TouchEvent> temp = new ArrayList<>(touched);
                 changes.push(() -> {
                     touched = temp;
                     for (int i = 0; i < touched.size(); i++) {
