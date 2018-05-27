@@ -1,14 +1,16 @@
 package com.github.michalp2213.GraphCalc.Controller;
 
 import com.github.michalp2213.GraphCalc.Model.AlgorithmEvents.*;
+import com.github.michalp2213.GraphCalc.Model.AlgorithmEvents.TouchEvent;
 import com.github.michalp2213.GraphCalc.Model.Algorithms.*;
 import com.github.michalp2213.GraphCalc.Model.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
+import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -94,6 +96,17 @@ public class GUIController {
     private VisitEvent visited;
     private int algorithmState;
 
+    public static void setupShortcuts(Scene s) {
+        s.addEventFilter(KeyEvent.KEY_PRESSED, (keyEvent) -> {
+            final KeyCombination keyComb = new KeyCodeCombination(KeyCode.ESCAPE);
+            if (keyComb.match(keyEvent)) {
+                //todo
+                System.out.println("Panek");
+                keyEvent.consume();
+            }
+        });
+    }
+
     @FXML
     public void showFileMenu() {
         fileMenu.setVisible(true);
@@ -171,9 +184,9 @@ public class GUIController {
     }
 
     @FXML
-    public void openGraphClicked(ActionEvent event){
+    public void openGraphClicked(ActionEvent event) {
         File f = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
-        if(f==null) return;
+        if (f == null) return;
         pathField.setText(f.getAbsolutePath());
     }
 
@@ -261,7 +274,7 @@ public class GUIController {
                 }
             }
         }
-        id = graph.getAdjacencyList().size()+1;
+        id = graph.getAdjacencyList().size() + 1;
     }
 
     @FXML
@@ -500,7 +513,7 @@ public class GUIController {
     }
 
     /*
-    ** BEGIN VERTEX SPREAD ALGORITHMS
+     ** BEGIN VERTEX SPREAD ALGORITHMS
      */
 
     private void spreadVerticesEvenly() {
@@ -528,21 +541,21 @@ public class GUIController {
 
     private void spreadVerticesFR() {
         spreadVerticesEvenly();
-        if (graph.getAdjacencyList().keySet().size() < 2){
+        if (graph.getAdjacencyList().keySet().size() < 2) {
             return;
         }
         double W = workspace.getWidth(), L = workspace.getHeight();
         double area = W * L;
-        double k = Math.sqrt(area/graph.getAdjacencyList().keySet().size());
+        double k = Math.sqrt(area / graph.getAdjacencyList().keySet().size());
         int iterations = 10;
-        double t = (W+L)/20;
+        double t = (W + L) / 20;
 
-        double fAttScalar = 1.0;
+        double fAttScalar = 0.5;
         //double fRepScalar = 1.0/graph.getAdjacencyList().keySet().size();
-        double fRepScalar = 5.0;
-        Function<Double, Double> fAtt = x -> ((x*x)/k)*fAttScalar;
-        Function<Double, Double> fRep = x -> ((k*k)/(x*Math.sqrt(x)))*fRepScalar;
-        Function<Double, Double> cool = x -> x - (W+L)/(40*iterations);
+        double fRepScalar = 1.0;
+        Function<Double, Double> fAtt = x -> ((x * x) / k) * fAttScalar;
+        Function<Double, Double> fRep = x -> ((k * k) / (x * Math.sqrt(x))) * fRepScalar;
+        Function<Double, Double> cool = x -> x - (W + L) / (20 * iterations);
 
         Map<Vertex, Pair<Double, Double>> pos = new HashMap<>();
         for (Vertex v : graph.getAdjacencyList().keySet()) {
@@ -558,84 +571,84 @@ public class GUIController {
                                 pos.get(v).getKey() - pos.get(u).getKey(),
                                 pos.get(v).getValue() - pos.get(u).getValue());
                         double diffVal = Math.sqrt(
-                                diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                                diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                         disp.put(v, new Pair<>(
-                                disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
-                                disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                                disp.get(v).getKey() + (diff.getKey() / diffVal) * fRep.apply(diffVal),
+                                disp.get(v).getValue() + (diff.getValue() / diffVal) * fRep.apply(diffVal)
                         ));
                     }
                 }
                 Pair<Double, Double> diff = new Pair<>(
                         pos.get(v).getKey(),
-                        pos.get(v).getValue() - L/2);
+                        pos.get(v).getValue() - L / 2);
                 double diffVal = Math.sqrt(
-                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                 disp.put(v, new Pair<>(
-                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
-                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                        disp.get(v).getKey() + (diff.getKey() / diffVal) * fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue() / diffVal) * fRep.apply(diffVal)
                 ));
                 diff = new Pair<>(
-                        pos.get(v).getKey() - W/2,
+                        pos.get(v).getKey() - W / 2,
                         pos.get(v).getValue());
                 diffVal = Math.sqrt(
-                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                 disp.put(v, new Pair<>(
-                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
-                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                        disp.get(v).getKey() + (diff.getKey() / diffVal) * fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue() / diffVal) * fRep.apply(diffVal)
                 ));
                 diff = new Pair<>(
                         pos.get(v).getKey() - W,
-                        pos.get(v).getValue() - L/2);
+                        pos.get(v).getValue() - L / 2);
                 diffVal = Math.sqrt(
-                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                 disp.put(v, new Pair<>(
-                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
-                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                        disp.get(v).getKey() + (diff.getKey() / diffVal) * fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue() / diffVal) * fRep.apply(diffVal)
                 ));
                 diff = new Pair<>(
-                        pos.get(v).getKey() - W/2,
+                        pos.get(v).getKey() - W / 2,
                         pos.get(v).getValue() - L);
                 diffVal = Math.sqrt(
-                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                 disp.put(v, new Pair<>(
-                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
-                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                        disp.get(v).getKey() + (diff.getKey() / diffVal) * fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue() / diffVal) * fRep.apply(diffVal)
                 ));
                 diff = new Pair<>(
                         pos.get(v).getKey(),
                         pos.get(v).getValue());
                 diffVal = Math.sqrt(
-                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                 disp.put(v, new Pair<>(
-                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
-                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                        disp.get(v).getKey() + (diff.getKey() / diffVal) * fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue() / diffVal) * fRep.apply(diffVal)
                 ));
                 diff = new Pair<>(
                         pos.get(v).getKey() - W,
                         pos.get(v).getValue());
                 diffVal = Math.sqrt(
-                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                 disp.put(v, new Pair<>(
-                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
-                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                        disp.get(v).getKey() + (diff.getKey() / diffVal) * fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue() / diffVal) * fRep.apply(diffVal)
                 ));
                 diff = new Pair<>(
                         pos.get(v).getKey() - W,
                         pos.get(v).getValue() - L);
                 diffVal = Math.sqrt(
-                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                 disp.put(v, new Pair<>(
-                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
-                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                        disp.get(v).getKey() + (diff.getKey() / diffVal) * fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue() / diffVal) * fRep.apply(diffVal)
                 ));
                 diff = new Pair<>(
                         pos.get(v).getKey(),
                         pos.get(v).getValue() - L);
                 diffVal = Math.sqrt(
-                        diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                        diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                 disp.put(v, new Pair<>(
-                        disp.get(v).getKey() + (diff.getKey()/diffVal)*fRep.apply(diffVal),
-                        disp.get(v).getValue() + (diff.getValue()/diffVal)*fRep.apply(diffVal)
+                        disp.get(v).getKey() + (diff.getKey() / diffVal) * fRep.apply(diffVal),
+                        disp.get(v).getValue() + (diff.getValue() / diffVal) * fRep.apply(diffVal)
                 ));
             }
             if (!graph.getClass().equals(UndirectedGraph.class)) {
@@ -646,14 +659,14 @@ public class GUIController {
                                 pos.get(e.to).getValue() - pos.get(e.from).getValue()
                         );
                         double diffVal = Math.sqrt(
-                                diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                                diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                         disp.put(e.from, new Pair<>(
-                                disp.get(e.from).getKey() + (diff.getKey()/diffVal)*fAtt.apply(diffVal),
-                                disp.get(e.from).getValue() + (diff.getValue()/diffVal)*fAtt.apply(diffVal)
+                                disp.get(e.from).getKey() + (diff.getKey() / diffVal) * fAtt.apply(diffVal),
+                                disp.get(e.from).getValue() + (diff.getValue() / diffVal) * fAtt.apply(diffVal)
                         ));
                         disp.put(e.to, new Pair<>(
-                                disp.get(e.to).getKey() - diff.getKey()*(fAtt.apply(diffVal)/diffVal),
-                                disp.get(e.to).getValue() - diff.getValue()*(fAtt.apply(diffVal)/diffVal)
+                                disp.get(e.to).getKey() - diff.getKey() * (fAtt.apply(diffVal) / diffVal),
+                                disp.get(e.to).getValue() - diff.getValue() * (fAtt.apply(diffVal) / diffVal)
                         ));
                     }
                 }
@@ -670,14 +683,14 @@ public class GUIController {
                                 pos.get(e.to).getValue() - pos.get(e.from).getValue()
                         );
                         double diffVal = Math.sqrt(
-                                diff.getKey()*diff.getKey() + diff.getValue()*diff.getValue());
+                                diff.getKey() * diff.getKey() + diff.getValue() * diff.getValue());
                         disp.put(e.to, new Pair<>(
-                                disp.get(e.to).getKey() - (diff.getKey()/diffVal)*fAtt.apply(diffVal),
-                                disp.get(e.to).getValue() - (diff.getValue()/diffVal)*fAtt.apply(diffVal)
+                                disp.get(e.to).getKey() - (diff.getKey() / diffVal) * fAtt.apply(diffVal),
+                                disp.get(e.to).getValue() - (diff.getValue() / diffVal) * fAtt.apply(diffVal)
                         ));
                         disp.put(e.from, new Pair<>(
-                                disp.get(e.from).getKey() + (diff.getKey()/diffVal)*fAtt.apply(diffVal),
-                                disp.get(e.from).getValue() + (diff.getValue()/diffVal)*fAtt.apply(diffVal)
+                                disp.get(e.from).getKey() + (diff.getKey() / diffVal) * fAtt.apply(diffVal),
+                                disp.get(e.from).getValue() + (diff.getValue() / diffVal) * fAtt.apply(diffVal)
                         ));
                     }
                 }
@@ -686,16 +699,16 @@ public class GUIController {
                 double dispVal = Math.sqrt(
                         disp.get(v).getKey() * disp.get(v).getKey() + disp.get(v).getValue() * disp.get(v).getValue());
                 pos.put(v, new Pair<>(
-                        pos.get(v).getKey() + disp.get(v).getKey() * (Math.min(dispVal, t)/dispVal),
-                        pos.get(v).getValue() + disp.get(v).getValue() * (Math.min(dispVal, t)/dispVal)
+                        pos.get(v).getKey() + disp.get(v).getKey() * (Math.min(dispVal, t) / dispVal),
+                        pos.get(v).getValue() + disp.get(v).getValue() * (Math.min(dispVal, t) / dispVal)
                 ));
                 pos.put(v, new Pair<>(
-                        Math.min((9*W)/10, Math.max(W/10, pos.get(v).getKey())),
+                        Math.min((9 * W) / 10, Math.max(W / 10, pos.get(v).getKey())),
                         pos.get(v).getValue()
                 ));
                 pos.put(v, new Pair<>(
                         pos.get(v).getKey(),
-                        Math.min((9*L)/10, Math.max(L/10, pos.get(v).getValue()))
+                        Math.min((9 * L) / 10, Math.max(L / 10, pos.get(v).getValue()))
                 ));
             }
             t = cool.apply(t);
@@ -999,7 +1012,7 @@ public class GUIController {
 
     @FXML
     private void nextStep() {
-        if(it.hasNext()) {
+        if (it.hasNext()) {
             AlgorithmEvent event = it.next();
             if (event.getClass() == TouchEvent.class) {
                 touched.add((TouchEvent) event);
@@ -1047,7 +1060,7 @@ public class GUIController {
     }
 
     private void pauseAlgorithm() {
-        if(running!=null){
+        if (running != null) {
             running.interrupt();
             running = null;
         }
@@ -1062,7 +1075,7 @@ public class GUIController {
 
     @FXML
     private void runPauseAndResumeButtonPressed() {
-        switch(algorithmState) {
+        switch (algorithmState) {
             case 2:
                 algorithmState = 1;
                 resumeAlgorithm();
@@ -1082,7 +1095,7 @@ public class GUIController {
 
     @FXML
     private void cancelAlgorithmButtonPressed() {
-        if(running!=null) running.interrupt();
+        if (running != null) running.interrupt();
         resetColoring();
         changes.clear();
         algorithmControlMenu.setVisible(false);
@@ -1091,7 +1104,7 @@ public class GUIController {
         touched.clear();
     }
 
-    private void resetColoring(){
+    private void resetColoring() {
         for (Vertex v : circles.keySet()) {
             setColor(v, Color.BLACK);
         }

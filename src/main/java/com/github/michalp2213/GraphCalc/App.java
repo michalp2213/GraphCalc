@@ -1,5 +1,6 @@
 package com.github.michalp2213.GraphCalc;
 
+import com.github.michalp2213.GraphCalc.Controller.GUIController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,6 +22,7 @@ public class App extends Application {
         Scene mainScene = new Scene(root, resolutionX, resolutionY);
         mainScene.getStylesheets().add(App.class.getResource("css/Style.css").toExternalForm());
         primaryStage.setTitle("GraphCalc");
+        GUIController.setupShortcuts(mainScene);
         primaryStage.setScene(mainScene);
         primaryStage.show();
     }
