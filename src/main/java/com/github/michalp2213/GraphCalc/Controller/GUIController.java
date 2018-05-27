@@ -142,8 +142,8 @@ public class GUIController {
 
     @FXML
     public void openGraphClicked(ActionEvent event){
-        file = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
-        pathField.setText(file.getAbsolutePath());
+        File f = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
+        pathField.setText(f.getAbsolutePath());
     }
 
     @FXML
@@ -190,6 +190,7 @@ public class GUIController {
 
     @FXML
     public void openClicked(ActionEvent event) {
+        reset();
         file = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
 
         if (file == null)
@@ -226,6 +227,7 @@ public class GUIController {
                 }
             }
         }
+        id = graph.getAdjacencyList().size()+1;
     }
 
     @FXML
