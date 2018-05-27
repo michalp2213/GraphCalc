@@ -792,6 +792,7 @@ public class GUIController {
                     if (prev != null)
                         setColor(visited.getTarget(), p1);
                 });
+                touched.clear();
                 setColor(event.getTarget(), Color.CRIMSON);
                 visited = (VisitEvent) event;
             }
@@ -841,10 +842,12 @@ public class GUIController {
 
     @FXML
     private void cancelAlgorithmButtonPressed() {
+        if(running!=null) running.interrupt();
         resetColoring();
         changes.clear();
         algorithmControlMenu.setVisible(false);
         running = null;
+        touched.clear();
     }
 
     private void resetColoring(){
