@@ -85,7 +85,7 @@ public class GUIController {
     private Stack<Runnable> changes = new Stack<>();
     private ArrayList<TouchEvent> touched = new ArrayList<>();
     private VisitEvent visited;
-    private boolean algorithmPaused;
+    private int algorithmState;
 
     @FXML
     public void showFileMenu() {
@@ -510,7 +510,7 @@ public class GUIController {
                 v = getVertex(c);
                 algorithmControlMenu.setVisible(true);
                 runPauseAndResumeButton.setText("Run");
-                latch.countDown();
+                algorithmState = 2;
             }
         };
     }
@@ -805,15 +805,21 @@ public class GUIController {
 
     @FXML
     private void runPauseAndResumeButtonPressed() {
-        if (!algorithmPaused) {
-            pauseAlgorithm();
-            algorithmPaused = true;
-            runPauseAndResumeButton.setText("Resume");
-        }
-        else {
-            resumeAlgorithm();
-            algorithmPaused = false;
-            runPauseAndResumeButton.setText("Pause");
+        switch(algorithmState) {
+            case 2:
+                latch.countDown();
+                algorithmState = 1;
+                runPauseAndResumeButton.setText("Pause");
+                break;
+            case 1:
+                pauseAlgorithm();
+                algorithmState = 0;
+                runPauseAndResumeButton.setText("Resume");
+                break;
+            case 0:
+                resumeAlgorithm();
+                algorithmState = 1;
+                runPauseAndResumeButton.setText("Pause");
         }
     }
 
