@@ -100,8 +100,16 @@ public class GUIController {
         s.addEventFilter(KeyEvent.KEY_PRESSED, (keyEvent) -> {
             final KeyCombination keyComb = new KeyCodeCombination(KeyCode.ESCAPE);
             if (keyComb.match(keyEvent)) {
-                //todo
-                System.out.println("Panek");
+                if (chooseVertexMode) {
+                    if (running != null) {
+                        running.interrupt();
+                        running = null;
+                    }
+                    chooseVertexMode = false;
+                    algorithmMode = false;
+                    changeMode(true, runAlgorithmButton);
+                }
+                //System.out.println("Panek");
                 keyEvent.consume();
             }
         });
@@ -120,7 +128,7 @@ public class GUIController {
 
     @FXML
     public void showAlgorithmMenu() {
-        if(algorithmMode) return;
+        if (algorithmMode) return;
         AnchorPane.setTopAnchor(algorithmMenu, runAlgorithmButton.localToScene(runAlgorithmButton.getBoundsInLocal()).getMinY());
         algorithmMenu.setVisible(true);
         algorithmMenu.toFront();
@@ -301,7 +309,7 @@ public class GUIController {
 
     @FXML
     public void addVertices(MouseEvent mouseEvent) {
-        if(algorithmMode) return;
+        if (algorithmMode) return;
         changeMode(addVerticesMode, addVerticesButton);
         addVerticesMode = !addVerticesMode;
         if (addVerticesMode) {
@@ -311,7 +319,7 @@ public class GUIController {
 
     @FXML
     public void addEdges(MouseEvent mouseEvent) {
-        if(algorithmMode) return;
+        if (algorithmMode) return;
         changeMode(addEdgesMode, addEdgesButton);
         addEdgesMode = !addEdgesMode;
         if (addEdgesMode) {
@@ -321,7 +329,7 @@ public class GUIController {
 
     @FXML
     public void removeObjects(MouseEvent mouseEvent) {
-        if(algorithmMode) return;
+        if (algorithmMode) return;
         changeMode(removeObjectsMode, removeObjectsButton);
         removeObjectsMode = !removeObjectsMode;
         if (removeObjectsMode) {
@@ -342,7 +350,7 @@ public class GUIController {
             try {
                 latch.await();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                return;
             }
             events = DFS.run(graph, v);
             chooseVertexMode = false;
@@ -356,7 +364,7 @@ public class GUIController {
 
     @FXML
     public void runBFSPressed(ActionEvent event) {
-        if(algorithmMode) return;
+        if (algorithmMode) return;
         hideAlgorithmMenu();
         changeMode(true, true, true);
         chooseVertexMode = true;
@@ -367,7 +375,7 @@ public class GUIController {
             try {
                 latch.await();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                return;
             }
             events = BFS.run(graph, v);
             chooseVertexMode = false;
@@ -943,9 +951,14 @@ public class GUIController {
         graph = new UndirectedGraph();
         id = 0;
         circles.clear();
-        if(running!=null) {
+        if (running != null) {
             running.interrupt();
             running = null;
+        }
+        if (chooseVertexMode) {
+            chooseVertexMode = false;
+            algorithmMode = false;
+            changeMode(true, runAlgorithmButton);
         }
         touched.clear();
         changes.clear();
@@ -965,6 +978,7 @@ public class GUIController {
             workspace.getChildren().add(arr[i]);
         }
     }
+
     @SuppressWarnings("SuspiciousMethodCalls")
     private void setColor(Object o, Paint p) {
         if (o.getClass() == Vertex.class) {
@@ -979,6 +993,7 @@ public class GUIController {
             }
         }
     }
+
     @SuppressWarnings("SuspiciousMethodCalls")
     private Paint getColor(Object o) {
         if (o.getClass() == Vertex.class) {
@@ -1068,7 +1083,7 @@ public class GUIController {
 
     private void resumeAlgorithm() {
         int delay = Integer.parseInt(algorithmDelayField.getText());
-        running = new Thread(()->runWithDelay(delay));
+        running = new Thread(() -> runWithDelay(delay));
         running.setDaemon(true);
         running.start();
     }
