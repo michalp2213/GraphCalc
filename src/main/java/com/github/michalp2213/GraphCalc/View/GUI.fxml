@@ -226,6 +226,13 @@
             </Label>
             <TextField fx:id="pathField"
                        minWidth="285"/>
+            <Button fx:id="openGraphButton"
+                    text="Open"
+                    maxWidth="70"
+                    minWidth="70"
+                    maxHeight="25"
+                    minHeight="25"
+                    onAction="#openGraphClicked"/>
         </HBox>
         <HBox GridPane.columnIndex="1"
               GridPane.rowIndex="2"
@@ -282,7 +289,7 @@
                 Delay:
             </Label>
 
-            <TextField fx:id="algorithmDelayField"/>
+            <TextField fx:id="algorithmDelayField" text="1000"/>
 
         </HBox>
 

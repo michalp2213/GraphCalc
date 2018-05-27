@@ -67,6 +67,7 @@ public class GUIController {
     public TextField algorithmDelayField;
     public Button cancelAlgorithmButton;
     public Label delayLabel;
+    public Button openGraphButton;
     private int id = 0;
     private Graph graph = new UndirectedGraph();
     private File file = null;
@@ -84,6 +85,7 @@ public class GUIController {
     private Vertex v;
     private Stack<Runnable> changes = new Stack<>();
     private ArrayList<TouchEvent> touched = new ArrayList<>();
+    private Thread running;
     private VisitEvent visited;
     private int algorithmState;
 
@@ -136,6 +138,12 @@ public class GUIController {
         sourceTypeBox.getSelectionModel().clearSelection();
         hidePath(event);
         newMenu.setVisible(false);
+    }
+
+    @FXML
+    public void openGraphClicked(ActionEvent event){
+        file = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
+        pathField.setText(file.getAbsolutePath());
     }
 
     @FXML
@@ -512,6 +520,7 @@ public class GUIController {
                 }
             } else if (algorithmMode) {
                 v = getVertex(c);
+                latch.countDown();
                 algorithmControlMenu.setVisible(true);
                 runPauseAndResumeButton.setText("Run");
                 algorithmState = 2;
@@ -734,13 +743,14 @@ public class GUIController {
         return Color.BLACK;
     }
 
-    private void runAlgorithm() {
+    private void runWithDelay(int delay) {
         while (it.hasNext()) {
             nextStep();
             try {
-                Thread.sleep(1000);
+                Thread.sleep(delay);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Thread.yield();
+                return;
             }
         }
         resetColoring();
@@ -797,19 +807,24 @@ public class GUIController {
     }
 
     private void pauseAlgorithm() {
-        //todo
+        if(running!=null){
+            running.interrupt();
+            running = null;
+        }
     }
 
     private void resumeAlgorithm() {
-        //todo
+        int delay = Integer.parseInt(algorithmDelayField.getText());
+        running = new Thread(()->runWithDelay(delay));
+        running.start();
     }
 
     @FXML
     private void runPauseAndResumeButtonPressed() {
         switch(algorithmState) {
             case 2:
-                latch.countDown();
                 algorithmState = 1;
+                resumeAlgorithm();
                 runPauseAndResumeButton.setText("Pause");
                 break;
             case 1:
@@ -829,6 +844,7 @@ public class GUIController {
         resetColoring();
         changes.clear();
         algorithmControlMenu.setVisible(false);
+        running = null;
     }
 
     private void resetColoring(){
