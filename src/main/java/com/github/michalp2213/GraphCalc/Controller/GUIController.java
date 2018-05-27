@@ -190,11 +190,12 @@ public class GUIController {
 
     @FXML
     public void openClicked(ActionEvent event) {
-        reset();
         file = fileChooser.showOpenDialog(mainFrame.getScene().getWindow());
 
         if (file == null)
             return;
+
+        reset();
 
         try {
             FileIO.readData r = FileIO.readFromFile(file);
@@ -215,7 +216,9 @@ public class GUIController {
         for (Map.Entry<Vertex, ? extends HashSet<Edge>> entry : graph.getAdjacencyList().entrySet()) {
             for (Edge e : entry.getValue()) {
 
-                if (!lines.keySet().contains(e) && !lines.keySet().contains(e.transpose())) {
+                if (!lines.keySet().contains(e)) {
+                    if (graph instanceof UndirectedGraph && lines.keySet().contains(e.transpose()))
+                        continue;
                     Node l = getLine(circles.get(e.from), circles.get(e.to));
 
                     lines.put(e, l);
@@ -272,6 +275,7 @@ public class GUIController {
 
     @FXML
     public void removeObjects(MouseEvent mouseEvent) {
+        openClicked(new ActionEvent());
         changeMode(removeObjectsMode, removeObjectsButton);
         removeObjectsMode = !removeObjectsMode;
         if (removeObjectsMode) {
