@@ -58,6 +58,11 @@ public class GUIController {
     public VBox algorithmMenu;
     public Button runDFSButton;
     public Button runBFSButton;
+    public VBox algorithmControlButtons;
+    public Button prevStepButton;
+    public Button nextStepButton;
+    public Button pauseAndResumeButton;
+    public HBox previousNextButtons;
     private int id = 0;
     private Graph graph = new UndirectedGraph();
     private File file = null;
@@ -76,6 +81,7 @@ public class GUIController {
     private Stack<Runnable> changes = new Stack<>();
     private ArrayList<TouchEvent> touched = new ArrayList<>();
     private VisitEvent visited;
+    private boolean algorithmPaused;
 
     @FXML
     public void showFileMenu() {
@@ -719,6 +725,10 @@ public class GUIController {
     }
 
     private void runAlgorithm() {
+        algorithmControlButtons.setVisible(true);
+        previousNextButtons.setVisible(false);
+        pauseAndResumeButton.setText("Pause");
+        algorithmPaused = false;
         while (it.hasNext()) {
             nextStep();
             try {
@@ -734,8 +744,10 @@ public class GUIController {
             setColor(e, Color.BLACK);
         }
         changes.clear();
+        algorithmControlButtons.setVisible(false);
     }
 
+    @FXML
     private void nextStep() {
         AlgorithmEvent event = it.next();
         if (event.getClass() == TouchEvent.class) {
@@ -773,10 +785,34 @@ public class GUIController {
         }
     }
 
+    @FXML
     private void previousStep() {
         if (it.hasPrevious()) {
             it.previous();
             changes.pop().run();
+        }
+    }
+
+    private void pauseAlgorithm() {
+        //todo
+    }
+
+    private void resumeAlgorithm() {
+        //todo
+    }
+    @FXML
+    private void pauseAndResumeButtonPressed() {
+        if (!algorithmPaused) {
+            pauseAlgorithm();
+            algorithmPaused = true;
+            pauseAndResumeButton.setText("Resume");
+            previousNextButtons.setVisible(true);
+        }
+        else {
+            resumeAlgorithm();
+            algorithmPaused = false;
+            pauseAndResumeButton.setText("Pause");
+            previousNextButtons.setVisible(false);
         }
     }
 }

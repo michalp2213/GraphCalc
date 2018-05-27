@@ -237,4 +237,44 @@
                     onAction="#newMenuAcceptAndExit"/>
         </HBox>
     </GridPane>
+
+    <VBox fx:id="algorithmControlButtons"
+          AnchorPane.leftAnchor="70"
+          AnchorPane.bottomAnchor="0"
+          maxWidth="140"
+          minWidth="140"
+          maxHeight="50"
+          minHeight="50"
+          visible="false">
+        <HBox fx:id="previousNextButtons"
+              visible="false">
+            <Button fx:id="prevStepButton"
+                    text="Previous step"
+                    maxWidth="70"
+                    minWidth="70"
+                    maxHeight="25"
+                    minHeight="25"
+                    onAction="#previousStep"
+                    textAlignment="CENTER"/>
+
+            <Button fx:id="nextStepButton"
+                    text="Next step"
+                    maxWidth="70"
+                    minWidth="70"
+                    maxHeight="25"
+                    minHeight="25"
+                    onAction="#nextStep"
+                    textAlignment="CENTER"/>
+        </HBox>
+
+        <Button fx:id="pauseAndResumeButton"
+                text="Pause"
+                maxWidth="140"
+                minWidth="140"
+                maxHeight="25"
+                minHeight="25"
+                onAction="#pauseAndResumeButtonPressed"
+                textAlignment="CENTER"/>
+
+    </VBox>
 </AnchorPane>
