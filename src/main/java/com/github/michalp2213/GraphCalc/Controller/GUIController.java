@@ -95,7 +95,7 @@ public class GUIController {
     private VisitEvent visited;
     private int algorithmState;
 
-    public static void setupShortcuts(Scene s) {
+    public void setupShortcuts(Scene s) {
         s.addEventFilter(KeyEvent.KEY_PRESSED, (keyEvent) -> {
             final KeyCombination keyComb = new KeyCodeCombination(KeyCode.ESCAPE);
             if (keyComb.match(keyEvent)) {

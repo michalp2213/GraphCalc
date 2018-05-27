@@ -18,11 +18,12 @@ public class App extends Application {
     }
 
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("View/GUI.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("View/GUI.fxml"));
+        Parent root = loader.load();
         Scene mainScene = new Scene(root, resolutionX, resolutionY);
         mainScene.getStylesheets().add(App.class.getResource("css/Style.css").toExternalForm());
         primaryStage.setTitle("GraphCalc");
-        GUIController.setupShortcuts(mainScene);
+        ((GUIController) loader.getController()).setupShortcuts(mainScene);
         primaryStage.setScene(mainScene);
         primaryStage.show();
     }
