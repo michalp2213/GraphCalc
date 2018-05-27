@@ -524,12 +524,12 @@ public class GUIController {
         int iterations = 10;
         double t = (W+L)/20;
 
-        double fAttScalar = 1.0;
+        double fAttScalar = 0.5;
         //double fRepScalar = 1.0/graph.getAdjacencyList().keySet().size();
-        double fRepScalar = 5.0;
+        double fRepScalar = 1.0;
         Function<Double, Double> fAtt = x -> ((x*x)/k)*fAttScalar;
         Function<Double, Double> fRep = x -> ((k*k)/(x*Math.sqrt(x)))*fRepScalar;
-        Function<Double, Double> cool = x -> x - (W+L)/(40*iterations);
+        Function<Double, Double> cool = x -> x - (W+L)/(20*iterations);
 
         Map<Vertex, Pair<Double, Double>> pos = new HashMap<>();
         for (Vertex v : graph.getAdjacencyList().keySet()) {
