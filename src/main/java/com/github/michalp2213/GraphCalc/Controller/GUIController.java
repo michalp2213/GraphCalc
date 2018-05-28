@@ -1022,7 +1022,9 @@ public class GUIController {
         }
         resetColoring();
         changes.clear();
+        touched.clear();
         algorithmControlMenu.setVisible(false);
+        algorithmMode = false;
     }
 
     @FXML
