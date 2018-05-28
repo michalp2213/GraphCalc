@@ -554,15 +554,18 @@ public class GUIController {
         }
         double W = workspace.getWidth(), L = workspace.getHeight();
         double area = W * L;
-        double k = Math.sqrt(area / graph.getAdjacencyList().keySet().size());
-        int iterations = 10;
+
+        final double kScalar = 10.0;
+        double k = (Math.sqrt(area) / graph.getAdjacencyList().keySet().size()) * kScalar;
+
+        int iterations = 100;
         double t = (W + L) / 20;
 
-        double fAttScalar = 0.5;
-        //double fRepScalar = 1.0/graph.getAdjacencyList().keySet().size();
-        double fRepScalar = 1.0;
+        final double fAttScalar = 1.0;
+        final double fRepScalar = 1.0;
+
         Function<Double, Double> fAtt = x -> ((x * x) / k) * fAttScalar;
-        Function<Double, Double> fRep = x -> ((k * k) / (x * Math.sqrt(x))) * fRepScalar;
+        Function<Double, Double> fRep = x -> ((k * k) / (x * x)) * fRepScalar;
         Function<Double, Double> cool = x -> x - (W + L) / (20 * iterations);
 
         Map<Vertex, Pair<Double, Double>> pos = new HashMap<>();
