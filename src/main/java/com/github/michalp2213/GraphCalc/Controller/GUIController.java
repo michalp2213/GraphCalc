@@ -95,6 +95,8 @@ public class GUIController {
     private Thread running;
     private VisitEvent visited;
     private int algorithmState;
+    private double targetX;
+    private double targetY;
 
     public void setupShortcuts(Scene s) {
         s.addEventFilter(KeyEvent.KEY_PRESSED, (keyEvent) -> {
@@ -260,6 +262,21 @@ public class GUIController {
 
         for (Circle c : circles.values()) {
             c.addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
+            c.setOnMousePressed((e) ->{
+                targetX = e.getX();
+                targetY = e.getY();
+            });
+            c.setOnMouseDragged((e) ->{
+                if(!removeObjectsMode&&!addVerticesMode&&!addEdgesMode){
+                    double offsetX = e.getX() - targetX;
+                    double offsetY = e.getY() - targetY;
+
+                    moveCircle(c, c.getCenterX()+offsetX, c.getCenterY()+offsetY);
+
+                    targetX = e.getX();
+                    targetY = e.getY();
+                }
+            });
             workspace.getChildren().add(c);
         }
 
@@ -390,13 +407,12 @@ public class GUIController {
     @FXML
     public void workspaceClicked(MouseEvent mouseEvent) {
         if (addVerticesMode) {
-            Circle c = new Circle(mouseEvent.getX(), mouseEvent.getY(), RADIUS);
+            Circle c = getCircle(mouseEvent.getX(), mouseEvent.getY());
             if (!containsCircle(c)) {
                 Vertex v = getVertex();
                 circles.put(v, c);
                 graph.addVertex(v);
                 workspace.getChildren().add(c);
-                c.addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
             }
         }
     }
@@ -460,7 +476,7 @@ public class GUIController {
     @SuppressWarnings("Duplicates")
     private void moveCircle(Circle a, double toX, double toY) {
         Vertex v = getVertex(a);
-        Circle c = new Circle(toX, toY, RADIUS);
+        Circle c = getCircle(toX, toY);
         for (Edge e : graph.getAdjacencyList().get(v)) {
             if (graph.getClass().equals(UndirectedGraph.class)) {
                 Line l = (Line) lines.get(e);
@@ -939,6 +955,27 @@ public class GUIController {
         return new Edge(v1, v2);
     }
 
+    private Circle getCircle(double x, double y){
+        Circle c = new Circle(x, y, RADIUS);
+        c.addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
+        c.setOnMousePressed((e) ->{
+            targetX = e.getX();
+            targetY = e.getY();
+        });
+        c.setOnMouseDragged((e) ->{
+            if(!removeObjectsMode&&!addVerticesMode&&!addEdgesMode){
+                double offsetX = e.getX() - targetX;
+                double offsetY = e.getY() - targetY;
+
+                moveCircle(c, c.getCenterX()+offsetX, c.getCenterY()+offsetY);
+
+                targetX = e.getX();
+                targetY = e.getY();
+            }
+        });
+        return c;
+    }
+
     private void putEdge(Edge edge, Node l) {
         if (!graph.containsEdge(edge)) {
             graph.addEdge(edge);
@@ -972,8 +1009,7 @@ public class GUIController {
 
     private void prepareArrays(Circle arr[], Vertex arr1[], int n) {
         for (int i = 0; i < n; i++) {
-            arr[i] = new Circle(0, i + 1, RADIUS);
-            arr[i].addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(arr[i]));
+            arr[i] = getCircle(0, i+1);
             Vertex v = getVertex();
             arr1[i] = v;
             graph.addVertex(v);
@@ -1087,7 +1123,13 @@ public class GUIController {
     }
 
     private void resumeAlgorithm() {
-        int delay = Integer.parseInt(algorithmDelayField.getText());
+        int delay;
+        try {
+            delay = Integer.parseInt(algorithmDelayField.getText());
+        }catch (Exception e){
+            showAlert("NaN", "Please, enter a valid number in delay field.");
+            throw e;
+        }
         running = new Thread(() -> runWithDelay(delay));
         running.setDaemon(true);
         running.start();
@@ -1097,8 +1139,12 @@ public class GUIController {
     private void runPauseAndResumeButtonPressed() {
         switch (algorithmState) {
             case 2:
-                algorithmState = 1;
+                try {
                 resumeAlgorithm();
+                } catch (Exception e){
+                    return;
+                }
+                algorithmState = 1;
                 runPauseAndResumeButton.setText("Pause");
                 break;
             case 1:
@@ -1107,7 +1153,11 @@ public class GUIController {
                 runPauseAndResumeButton.setText("Resume");
                 break;
             case 0:
-                resumeAlgorithm();
+                try {
+                    resumeAlgorithm();
+                } catch (Exception e){
+                    return;
+                }
                 algorithmState = 1;
                 runPauseAndResumeButton.setText("Pause");
         }
