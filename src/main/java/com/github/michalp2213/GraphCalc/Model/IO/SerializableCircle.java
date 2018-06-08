@@ -1,4 +1,4 @@
-package com.github.michalp2213.GraphCalc.Model;
+package com.github.michalp2213.GraphCalc.Model.IO;
 
 import javafx.scene.shape.Circle;
 

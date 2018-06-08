@@ -1,7 +1,9 @@
-package com.github.michalp2213.GraphCalc.Model;
+package com.github.michalp2213.GraphCalc.Model.Graphs;
+
+import com.github.michalp2213.GraphCalc.Model.Graph.Edge;
+import com.github.michalp2213.GraphCalc.Model.Graph.Vertex;
 
 import java.util.HashMap;
-import java.util.Set;
 
 /**
  * Class describing poset(partially ordered set). Null as vertex isn't accepted.

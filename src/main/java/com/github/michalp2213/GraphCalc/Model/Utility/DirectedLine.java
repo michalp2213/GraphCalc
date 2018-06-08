@@ -1,4 +1,4 @@
-package com.github.michalp2213.GraphCalc.Model;
+package com.github.michalp2213.GraphCalc.Model.Utility;
 
 import javafx.scene.Group;
 import javafx.scene.paint.Paint;

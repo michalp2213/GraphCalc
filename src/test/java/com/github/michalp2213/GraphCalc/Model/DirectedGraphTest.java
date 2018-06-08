@@ -1,5 +1,8 @@
 package com.github.michalp2213.GraphCalc.Model;
 
+import com.github.michalp2213.GraphCalc.Model.Graph.Edge;
+import com.github.michalp2213.GraphCalc.Model.Graph.Vertex;
+import com.github.michalp2213.GraphCalc.Model.Graphs.DirectedGraph;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,4 +1,8 @@
-package com.github.michalp2213.GraphCalc.Model;
+package com.github.michalp2213.GraphCalc.Model.Graphs;
+
+import com.github.michalp2213.GraphCalc.Model.Graph.Edge;
+import com.github.michalp2213.GraphCalc.Model.Graph.Graph;
+import com.github.michalp2213.GraphCalc.Model.Graph.Vertex;
 
 import java.util.Collections;
 import java.util.HashMap;

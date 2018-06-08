@@ -1,7 +1,8 @@
-package com.github.michalp2213.GraphCalc.Model;
+package com.github.michalp2213.GraphCalc.Model.IO;
 
+import com.github.michalp2213.GraphCalc.Model.Graph.Graph;
+import com.github.michalp2213.GraphCalc.Model.Graph.Vertex;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 
 import java.io.*;
 import java.util.HashMap;

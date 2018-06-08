@@ -3,9 +3,9 @@ package com.github.michalp2213.GraphCalc.Model.Algorithms;
 import com.github.michalp2213.GraphCalc.Model.AlgorithmEvents.AlgorithmEvent;
 import com.github.michalp2213.GraphCalc.Model.AlgorithmEvents.TouchEvent;
 import com.github.michalp2213.GraphCalc.Model.AlgorithmEvents.VisitEvent;
-import com.github.michalp2213.GraphCalc.Model.Edge;
-import com.github.michalp2213.GraphCalc.Model.Graph;
-import com.github.michalp2213.GraphCalc.Model.Vertex;
+import com.github.michalp2213.GraphCalc.Model.Graph.Edge;
+import com.github.michalp2213.GraphCalc.Model.Graph.Graph;
+import com.github.michalp2213.GraphCalc.Model.Graph.Vertex;
 
 import java.util.*;
 
