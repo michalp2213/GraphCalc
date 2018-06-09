@@ -11,6 +11,8 @@ import com.github.michalp2213.GraphCalc.Model.Graphs.Poset;
 import com.github.michalp2213.GraphCalc.Model.Graphs.UndirectedGraph;
 import com.github.michalp2213.GraphCalc.Model.IO.FileIO;
 import com.github.michalp2213.GraphCalc.Model.Utility.DirectedLine;
+import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -23,6 +25,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.transform.Translate;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
 
@@ -32,18 +35,21 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 
 public class GUIController {
     private static final int RADIUS = 6;
     private static final double WIDTH = 2;
+    private static final int FPS = 300;
+
     public Button fileButton;
     public Button addVerticesButton;
     public Button addEdgesButton;
     public Button removeObjectsButton;
     public Button zoomInButton;
     public Button zoomOutButton;
-    public CheckBox lockCheckBox;
+    public CheckBox smoothCheckBox;
     public VBox leftSideButtons;
     public VBox graphOperationButtons;
     public VBox viewOptionButtons;
@@ -81,6 +87,8 @@ public class GUIController {
     public Button spreadEvenlyButton;
     public Button spreadFRButton;
     public Button openGraphButton;
+    public Button spreadRandomlyButton;
+    public Button spreadToposortButton;
     private int id = 0;
     private Graph graph = new UndirectedGraph();
     private File file = null;
@@ -162,13 +170,41 @@ public class GUIController {
 
     @FXML
     public void spreadVerticesEvenlyPressed() {
-        spreadVerticesEvenly();
+        if (smoothCheckBox.isSelected()){
+            spreadVerticesEvenlySmooth();
+        } else {
+            spreadVerticesEvenly();
+        }
         hideSpreadMenu();
     }
 
     @FXML
     public void spreadVerticesFRPressed() {
-        spreadVerticesFR();
+        if (smoothCheckBox.isSelected()) {
+            spreadVerticesFRSmooth();
+        } else {
+            spreadVerticesFR();
+        }
+        hideSpreadMenu();
+    }
+
+    @FXML
+    public void spreadVerticesRandomlyPressed() {
+        if (smoothCheckBox.isSelected()) {
+            spreadVerticesRandomlySmooth();
+        } else {
+            spreadVerticesRandomly();
+        }
+        hideSpreadMenu();
+    }
+
+    @FXML
+    public void spreadVerticesToposortPressed() {
+        if (smoothCheckBox.isSelected()) {
+            spreadVerticesToposortSmooth();
+        } else {
+            spreadVerticesToposort();
+        }
         hideSpreadMenu();
     }
 
@@ -480,6 +516,10 @@ public class GUIController {
         alert.showAndWait();
     }
 
+    /*
+     ** BEGIN CIRCLE MOVEMENT FUNCTIONS
+     */
+
     @SuppressWarnings("Duplicates")
     private void moveCircle(Circle a, double toX, double toY) {
         Vertex v = getVertex(a);
@@ -543,17 +583,111 @@ public class GUIController {
         a.setCenterY(toY);
     }
 
+    private void moveCircleGroup(Map<Circle, Pair<Double, Double>> positions) {
+        for (Map.Entry<Circle, Pair<Double, Double>> e : positions.entrySet()) {
+            moveCircle(e.getKey(), e.getValue().getKey(), e.getValue().getValue());
+        }
+    }
+
+    private Thread moveCircleSmooth(Circle a, double toX, double toY, int time) {
+        Thread t = new Thread(() -> {
+                if (time == 0) {
+                    Platform.runLater(() -> moveCircle(a, toX, toY));
+                    return;
+                }
+                double frameCount = (time * FPS) / 1000;
+                double stepX = (toX - a.getCenterX()) / frameCount;
+                double stepY = (toY - a.getCenterY()) / frameCount;
+                for (int i = 0; i < frameCount; i++) {
+                    Platform.runLater(() -> moveCircle(a, a.getCenterX() + stepX, a.getCenterY() + stepY));
+                    try {
+                        Thread.sleep((1000 / FPS));
+                    } catch (InterruptedException e) {
+                        moveCircle(a, toX, toY);
+                        return;
+                    }
+                }
+        });
+        t.setDaemon(true);
+        t.start();
+        return t;
+    }
+
+    private Thread moveCircleGroupSmooth(Map<Circle, Pair<Double, Double>> positions, int time) {
+        Thread t = new Thread(() -> {
+            if (time == 0) {
+                for (Map.Entry<Circle, Pair<Double, Double>> e : positions.entrySet()) {
+                    Platform.runLater(() -> moveCircle(e.getKey(), e.getValue().getKey(), e.getValue().getValue()));
+                }
+                return;
+            }
+            double frameCount = (time * FPS) / (1000*positions.keySet().size());
+            Map<Circle, Pair<Double, Double>> steps = new HashMap<>();
+            for (Map.Entry<Circle, Pair<Double, Double>> e : positions.entrySet()) {
+                double stepX = (e.getValue().getKey() - e.getKey().getCenterX()) / frameCount;
+                double stepY = (e.getValue().getValue() - e.getKey().getCenterY()) / frameCount;
+                steps.put(e.getKey(), new Pair<>(stepX, stepY));
+            }
+            for (int i = 0; i < frameCount; i++) {
+                for (Circle c : positions.keySet()) {
+                    Platform.runLater(() -> moveCircle(c, c.getCenterX() + steps.get(c).getKey(),
+                            c.getCenterY() + steps.get(c).getValue()));
+                    try {
+                        Thread.sleep((1000 / FPS));
+                    } catch (InterruptedException e) {
+                        moveCircle(c, positions.get(c).getKey(), positions.get(c).getValue());
+                        return;
+                    }
+                }
+            }
+        });
+        t.setDaemon(true);
+        t.start();
+        return t;
+    }
+
+    /*
+     ** END CIRCLE MOVEMENT FUNCTIONS
+     */
+
     /*
      ** BEGIN VERTEX SPREAD ALGORITHMS
      */
 
-    private void spreadVerticesEvenly() {
+    private Map<Circle, Pair<Double, Double>> getSpreadVerticesRandomlyPositions() {
+        Map<Circle, Pair<Double, Double>> positions = new HashMap<>();
+        Random gen = new Random();
+        Supplier<Double> getViableWidthRandom = () -> (gen.nextDouble() * ((8.0/10.0) * workspace.getWidth())) + (1.0/10.0) * workspace.getWidth();
+        Supplier<Double> getViableHeightRandom = () -> (gen.nextDouble() * ((8.0/10.0) * workspace.getHeight())) + (1.0/10.0) * workspace.getHeight();
+        for (Circle c : circles.values()) {
+            positions.put(c, new Pair<>(getViableWidthRandom.get(), getViableHeightRandom.get()));
+        }
+        return positions;
+    }
+
+    private void spreadVerticesRandomly() {
+        Map<Circle, Pair<Double, Double>> positions = getSpreadVerticesRandomlyPositions();
+        if (positions.size() != 0) {
+            moveCircleGroup(positions);
+        }
+    }
+
+    private Thread spreadVerticesRandomlySmooth() {
+        Map<Circle, Pair<Double, Double>> positions = getSpreadVerticesRandomlyPositions();
+        if (positions.size() != 0) {
+            return moveCircleGroupSmooth(positions, 1250);
+        }
+        return null;
+    }
+
+    private Map<Circle, Pair<Double, Double>> getSpreadVerticesEvenlyPositions() {
+        Map<Circle, Pair<Double, Double>> positions = new HashMap<>();
         if (graph.getAdjacencyList().keySet().size() != 0) {
             double midX = workspace.getWidth() / 2;
             double midY = workspace.getHeight() / 2;
             if (graph.getAdjacencyList().keySet().size() == 1) {
                 Circle v = circles.get(graph.getAdjacencyList().keySet().iterator().next());
-                moveCircle(v, midX, midY);
+                positions.put(v, new Pair<>(midX, midY));
             } else {
                 double polygonRadius = Math.min(2 * midX / 3, 2 * midY / 3);
                 int k = graph.getAdjacencyList().keySet().size();
@@ -563,17 +697,33 @@ public class GUIController {
                     double arg = (2 * j * Math.PI) / k;
                     double toX = Math.cos(arg) * polygonRadius + midX;
                     double toY = Math.sin(arg) * polygonRadius + midY;
-                    moveCircle(v, toX, toY);
+                    positions.put(v, new Pair<>(toX, toY));
                     j++;
                 }
             }
         }
+        return positions;
     }
 
-    private void spreadVerticesFR() {
-        spreadVerticesEvenly();
-        if (graph.getAdjacencyList().keySet().size() < 2) {
-            return;
+    private void spreadVerticesEvenly() {
+        Map<Circle, Pair<Double, Double>> positions = getSpreadVerticesEvenlyPositions();
+        if (positions.size() != 0) {
+            moveCircleGroup(positions);
+        }
+    }
+
+    private Thread spreadVerticesEvenlySmooth() {
+        Map<Circle, Pair<Double, Double>> positions = getSpreadVerticesEvenlyPositions();
+        if (positions.size() != 0) {
+            return moveCircleGroupSmooth(positions, 1250);
+        }
+        return null;
+    }
+
+    private ArrayList<Map<Circle, Pair<Double, Double>>> getSpreadVerticesFRIterationPositions() {
+        ArrayList<Map<Circle, Pair<Double, Double>>> toReturn = new ArrayList<>();
+        if (graph.getAdjacencyList().keySet().size() <= 0) {
+            return toReturn;
         }
         double W = workspace.getWidth(), L = workspace.getHeight();
         double area = W * L;
@@ -745,11 +895,117 @@ public class GUIController {
                         Math.min((9 * L) / 10, Math.max(L / 10, pos.get(v).getValue()))
                 ));
             }
+            Map<Circle, Pair<Double, Double>> newPositions = new HashMap<>();
+            for (Map.Entry<Vertex, Pair<Double, Double>> e : pos.entrySet()) {
+                newPositions.put(circles.get(e.getKey()), new Pair<>(e.getValue().getKey(), e.getValue().getValue()));
+            }
+            toReturn.add(newPositions);
             t = cool.apply(t);
         }
-        for (Map.Entry<Vertex, Pair<Double, Double>> e : pos.entrySet()) {
-            moveCircle(circles.get(e.getKey()), e.getValue().getKey(), e.getValue().getValue());
+        return toReturn;
+    }
+
+    private void spreadVerticesFR() {
+        spreadVerticesRandomly();
+        ArrayList<Map<Circle, Pair<Double, Double>>> positions  = getSpreadVerticesFRIterationPositions();
+        if (positions.size() != 0) {
+            moveCircleGroup(positions.get(positions.size() - 1));
         }
+    }
+
+    private void spreadVerticesFRSmooth() {
+        Thread t = new Thread(() -> {
+            try {
+                spreadVerticesRandomlySmooth().join();
+                ArrayList<Map<Circle, Pair<Double, Double>>> positions = getSpreadVerticesFRIterationPositions();
+                if (positions.size() == 0) {
+                    return;
+                }
+                for (int i = 0; i < positions.size() - 1; i++) {
+                    if (i % (positions.size() / 10) == 0) {
+                        moveCircleGroupSmooth(positions.get(i), 1250 / (i/10 + 1)).join();
+                    }
+                }
+                moveCircleGroupSmooth(positions.get(positions.size() - 1), 125).join();
+            } catch (InterruptedException e) {
+                spreadVerticesEvenly();
+            }
+        });
+        t.setDaemon(true);
+        t.start();
+    }
+
+    private Map<Circle, Pair<Double, Double>> getSpreadVerticesToposortPositions() {
+        Map<Circle, Pair<Double, Double>> positions = new HashMap<>();
+        Map<Vertex, Integer> inDeg = new HashMap<>();
+        for (Vertex v : graph.getAdjacencyList().keySet()) {
+            inDeg.put(v, 0);
+        }
+        for (Vertex v : graph.getAdjacencyList().keySet()) {
+            for (Edge e : graph.getAdjacencyList().get(v)) {
+                inDeg.put(e.to, inDeg.get(e.to) + 1);
+            }
+        }
+
+        ArrayList<ArrayList<Vertex>> layers = new ArrayList<>();
+        Queue<Vertex> zeroInDeg = new ArrayDeque<>();
+        Set<Vertex> visited = new HashSet<>();
+        zeroInDeg.add(new Vertex(-1));
+
+        for (Vertex v : graph.getAdjacencyList().keySet()) {
+            if (inDeg.get(v) == 0) {
+                zeroInDeg.add(v);
+                visited.add(v);
+            }
+        }
+
+        while (!zeroInDeg.isEmpty()) {
+            Vertex v = zeroInDeg.poll();
+            if (v.getLabel() == -1) {
+                if (zeroInDeg.size() == 0) {
+                    break;
+                }
+                layers.add(new ArrayList<>());
+                layers.get(layers.size() - 1).addAll(zeroInDeg);
+                zeroInDeg.add(new Vertex(-1));
+            } else {
+                for (Edge e : graph.getAdjacencyList().get(v)) {
+                    visited.add(e.to);
+                    inDeg.put(e.to, inDeg.get(e.to) - 1);
+                    if (inDeg.get(e.to) == 0) {
+                        zeroInDeg.add(e.to);
+                    }
+                }
+            }
+        }
+
+        double xDiff = workspace.getWidth()/(layers.size() + 1);
+        double distFromLeft = xDiff;
+        for (ArrayList<Vertex> arr : layers) {
+            double yDiff = workspace.getHeight()/(arr.size() + 1);
+            double distFromBottom = yDiff;
+            for (Vertex v : arr) {
+                positions.put(circles.get(v), new Pair<>(distFromLeft, distFromBottom));
+                distFromBottom += yDiff;
+            }
+            distFromLeft += xDiff;
+        }
+        return positions;
+    }
+
+    private void spreadVerticesToposort() {
+        Map<Circle, Pair<Double, Double>> positions = getSpreadVerticesToposortPositions();
+        if (positions != null) {
+            moveCircleGroup(positions);
+        }
+    }
+
+    private Thread spreadVerticesToposortSmooth() {
+        Map<Circle, Pair<Double, Double>> positions = getSpreadVerticesToposortPositions();
+        if (positions != null) {
+            return moveCircleGroupSmooth(positions, 1250);
+        }
+        return null;
     }
 
     /*

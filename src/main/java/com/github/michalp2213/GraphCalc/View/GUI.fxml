@@ -3,7 +3,6 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<?import javafx.scene.text.Text?>
 <AnchorPane fx:id="mainFrame"
             xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -94,14 +93,6 @@
                     minWidth="70"
                     maxHeight="25"
                     minHeight="25"/>
-            <!--
-            <CheckBox fx:id="lockCheckBox"
-                      text="Lock"
-                      maxWidth="70"
-                      minWidth="70"
-                      maxHeight="25"
-                      minHeight="25"/>
-             -->
         </VBox>
     </VBox>
 
@@ -151,10 +142,9 @@
 
     <VBox fx:id="spreadMenu"
           AnchorPane.leftAnchor="70"
-          AnchorPane.rightAnchor="140"
-          minHeight="100"
+          minHeight="125"
           minWidth="70"
-          maxHeight="100"
+          maxHeight="125"
           maxWidth="70"
           visible="false"
           onMouseEntered="#showSpreadMenu"
@@ -177,6 +167,31 @@
                 minHeight="25"
                 onAction="#spreadVerticesFRPressed"
                 textAlignment="CENTER"/>
+
+        <Button fx:id="spreadRandomlyButton"
+                text="Randomly"
+                maxWidth="70"
+                minWidth="70"
+                maxHeight="25"
+                minHeight="25"
+                onAction="#spreadVerticesRandomlyPressed"
+                textAlignment="CENTER"/>
+
+        <Button fx:id="spreadToposortButton"
+                text="Toposort"
+                maxWidth="70"
+                minWidth="70"
+                maxHeight="25"
+                minHeight="25"
+                onAction="#spreadVerticesToposortPressed"
+                textAlignment="CENTER"/>
+
+        <CheckBox fx:id="smoothCheckBox"
+                  text="Smooth"
+                  maxWidth="70"
+                  minWidth="70"
+                  maxHeight="25"
+                  minHeight="25"/>
     </VBox>
 
     <VBox fx:id="algorithmMenu"
