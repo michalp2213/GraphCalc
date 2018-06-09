@@ -650,6 +650,32 @@ public class GUIController {
      ** END CIRCLE MOVEMENT FUNCTIONS
      */
 
+    private boolean isCyclic() {
+        Set<Vertex> globalVisited = new HashSet<>();
+        for (Vertex v : graph.getAdjacencyList().keySet()) {
+            if (!globalVisited.contains(v)) {
+                globalVisited.add(v);
+                Queue<Vertex> q = new ArrayDeque<>();
+                q.add(v);
+                Set<Vertex> visitedInIteration = new HashSet<>();
+                while (!q.isEmpty()) {
+                    Vertex u = q.poll();
+                    visitedInIteration.add(u);
+                    for (Edge e : graph.getAdjacencyList().get(u)) {
+                        if (visitedInIteration.contains(e.to)) {
+                            return true;
+                        }
+                        if (!globalVisited.contains(e.to)) {
+                            globalVisited.add(e.to);
+                            q.add(e.to);
+                        }
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     /*
      ** BEGIN VERTEX SPREAD ALGORITHMS
      */
@@ -936,6 +962,9 @@ public class GUIController {
     }
 
     private Map<Circle, Pair<Double, Double>> getSpreadVerticesToposortPositions() {
+        if (isCyclic()) {
+            return null;
+        }
         Map<Circle, Pair<Double, Double>> positions = new HashMap<>();
         Map<Vertex, Integer> inDeg = new HashMap<>();
         for (Vertex v : graph.getAdjacencyList().keySet()) {
@@ -1004,8 +1033,9 @@ public class GUIController {
         Map<Circle, Pair<Double, Double>> positions = getSpreadVerticesToposortPositions();
         if (positions != null) {
             return moveCircleGroupSmooth(positions, 1250);
+        } else {
+            return null;
         }
-        return null;
     }
 
     /*
