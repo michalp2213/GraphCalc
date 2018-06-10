@@ -79,7 +79,7 @@
 
         <Region VBox.vgrow="ALWAYS"/>
 
-        <VBox fx:id="viewOptionButtons">
+        <!-- <VBox fx:id="viewOptionButtons">
             <Button fx:id="zoomInButton"
                     text="Zoom in"
                     maxWidth="70"
@@ -93,7 +93,7 @@
                     minWidth="70"
                     maxHeight="25"
                     minHeight="25"/>
-        </VBox>
+        </VBox> -->
     </VBox>
 
     <VBox fx:id="fileMenu"
@@ -299,7 +299,7 @@
     </GridPane>
 
     <VBox fx:id="algorithmControlMenu"
-          AnchorPane.leftAnchor="70"
+          AnchorPane.leftAnchor="0"
           AnchorPane.bottomAnchor="0"
           maxWidth="140"
           minWidth="140"
