@@ -11,7 +11,6 @@ import com.github.michalp2213.GraphCalc.Model.Graphs.Poset;
 import com.github.michalp2213.GraphCalc.Model.Graphs.UndirectedGraph;
 import com.github.michalp2213.GraphCalc.Model.IO.FileIO;
 import com.github.michalp2213.GraphCalc.Model.Utility.DirectedLine;
-import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -25,7 +24,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.transform.Translate;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.util.Pair;
 
@@ -47,12 +46,12 @@ public class GUIController {
     public Button addVerticesButton;
     public Button addEdgesButton;
     public Button removeObjectsButton;
-    public Button zoomInButton;
-    public Button zoomOutButton;
+    //public Button zoomInButton;
+    //public Button zoomOutButton;
     public CheckBox smoothCheckBox;
     public VBox leftSideButtons;
     public VBox graphOperationButtons;
-    public VBox viewOptionButtons;
+    //public VBox viewOptionButtons;
     public VBox fileMenu;
     public Button newButton;
     public Button openButton;
@@ -89,6 +88,7 @@ public class GUIController {
     public Button openGraphButton;
     public Button spreadRandomlyButton;
     public Button spreadToposortButton;
+    public Text infoField;
     private int id = 0;
     private Graph graph = new UndirectedGraph();
     private File file = null;
@@ -397,9 +397,16 @@ public class GUIController {
         }
     }
 
+    private void showInfoField(String text) {
+        infoField.setText(text);
+        infoField.setVisible(true);
+        //infoField.toBack();
+    }
+
     @FXML
     public void runDFSPressed(ActionEvent event) {
         if (algorithmMode) return;
+        showInfoField("Choose starting vertex or press ESC to cancel");
         hideAlgorithmMenu();
         changeMode(true, true, true);
         chooseVertexMode = true;
@@ -409,7 +416,9 @@ public class GUIController {
         running = new Thread(() -> {
             try {
                 latch.await();
+                infoField.setVisible(false);
             } catch (InterruptedException e) {
+                infoField.setVisible(false);
                 return;
             }
             events = DFS.run(graph, v);
@@ -425,6 +434,7 @@ public class GUIController {
     @FXML
     public void runBFSPressed(ActionEvent event) {
         if (algorithmMode) return;
+        showInfoField("Choose starting vertex or press ESC to cancel");
         hideAlgorithmMenu();
         changeMode(true, true, true);
         chooseVertexMode = true;
@@ -434,7 +444,9 @@ public class GUIController {
         running = new Thread(() -> {
             try {
                 latch.await();
+                infoField.setVisible(false);
             } catch (InterruptedException e) {
+                infoField.setVisible(false);
                 return;
             }
             events = BFS.run(graph, v);

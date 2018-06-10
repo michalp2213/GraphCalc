@@ -3,6 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.text.Text?>
+
 <AnchorPane fx:id="mainFrame"
             xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
@@ -11,6 +13,12 @@
             maxWidth="Infinity"
             minHeight="600"
             maxHeight="Infinity">
+
+    <Text fx:id="infoField"
+        AnchorPane.bottomAnchor="0"
+        AnchorPane.rightAnchor="0"
+        visible="false"/>
+
     <VBox fx:id="leftSideButtons"
           AnchorPane.leftAnchor="0"
           AnchorPane.topAnchor="0"

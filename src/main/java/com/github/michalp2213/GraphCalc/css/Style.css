@@ -45,10 +45,6 @@
     -fx-background-color:lightgray;
 }
 
-#prevStepButton {
-    -fx-set-graphic: 'Arrow_right.svg';
-}
-
-#nextStepButton {
-
+#infoField {
+    -fx-font: 20px Verdana;
 }
