@@ -170,7 +170,7 @@ public class GUIController {
 
     @FXML
     public void spreadVerticesEvenlyPressed() {
-        if (smoothCheckBox.isSelected()){
+        if (smoothCheckBox.isSelected()) {
             spreadVerticesEvenlySmooth();
         } else {
             spreadVerticesEvenly();
@@ -305,16 +305,16 @@ public class GUIController {
 
         for (Circle c : circles.values()) {
             c.addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
-            c.setOnMousePressed((e) ->{
+            c.setOnMousePressed((e) -> {
                 targetX = e.getX();
                 targetY = e.getY();
             });
-            c.setOnMouseDragged((e) ->{
-                if(!removeObjectsMode&&!addVerticesMode&&!addEdgesMode){
+            c.setOnMouseDragged((e) -> {
+                if (!removeObjectsMode && !addVerticesMode && !addEdgesMode) {
                     double offsetX = e.getX() - targetX;
                     double offsetY = e.getY() - targetY;
 
-                    moveCircle(c, c.getCenterX()+offsetX, c.getCenterY()+offsetY);
+                    moveCircle(c, c.getCenterX() + offsetX, c.getCenterY() + offsetY);
 
                     targetX = e.getX();
                     targetY = e.getY();
@@ -603,22 +603,22 @@ public class GUIController {
 
     private Thread moveCircleSmooth(Circle a, double toX, double toY, int time) {
         Thread t = new Thread(() -> {
-                if (time == 0) {
-                    Platform.runLater(() -> moveCircle(a, toX, toY));
+            if (time == 0) {
+                Platform.runLater(() -> moveCircle(a, toX, toY));
+                return;
+            }
+            double frameCount = (time * FPS) / 1000;
+            double stepX = (toX - a.getCenterX()) / frameCount;
+            double stepY = (toY - a.getCenterY()) / frameCount;
+            for (int i = 0; i < frameCount; i++) {
+                Platform.runLater(() -> moveCircle(a, a.getCenterX() + stepX, a.getCenterY() + stepY));
+                try {
+                    Thread.sleep((1000 / FPS));
+                } catch (InterruptedException e) {
+                    moveCircle(a, toX, toY);
                     return;
                 }
-                double frameCount = (time * FPS) / 1000;
-                double stepX = (toX - a.getCenterX()) / frameCount;
-                double stepY = (toY - a.getCenterY()) / frameCount;
-                for (int i = 0; i < frameCount; i++) {
-                    Platform.runLater(() -> moveCircle(a, a.getCenterX() + stepX, a.getCenterY() + stepY));
-                    try {
-                        Thread.sleep((1000 / FPS));
-                    } catch (InterruptedException e) {
-                        moveCircle(a, toX, toY);
-                        return;
-                    }
-                }
+            }
         });
         t.setDaemon(true);
         t.start();
@@ -633,7 +633,7 @@ public class GUIController {
                 }
                 return;
             }
-            double frameCount = (time * FPS) / (1000*positions.keySet().size());
+            double frameCount = (time * FPS) / (1000 * positions.keySet().size());
             Map<Circle, Pair<Double, Double>> steps = new HashMap<>();
             for (Map.Entry<Circle, Pair<Double, Double>> e : positions.entrySet()) {
                 double stepX = (e.getValue().getKey() - e.getKey().getCenterX()) / frameCount;
@@ -695,8 +695,8 @@ public class GUIController {
     private Map<Circle, Pair<Double, Double>> getSpreadVerticesRandomlyPositions() {
         Map<Circle, Pair<Double, Double>> positions = new HashMap<>();
         Random gen = new Random();
-        Supplier<Double> getViableWidthRandom = () -> (gen.nextDouble() * ((8.0/10.0) * workspace.getWidth())) + (1.0/10.0) * workspace.getWidth();
-        Supplier<Double> getViableHeightRandom = () -> (gen.nextDouble() * ((8.0/10.0) * workspace.getHeight())) + (1.0/10.0) * workspace.getHeight();
+        Supplier<Double> getViableWidthRandom = () -> (gen.nextDouble() * ((8.0 / 10.0) * workspace.getWidth())) + (1.0 / 10.0) * workspace.getWidth();
+        Supplier<Double> getViableHeightRandom = () -> (gen.nextDouble() * ((8.0 / 10.0) * workspace.getHeight())) + (1.0 / 10.0) * workspace.getHeight();
         for (Circle c : circles.values()) {
             positions.put(c, new Pair<>(getViableWidthRandom.get(), getViableHeightRandom.get()));
         }
@@ -945,7 +945,7 @@ public class GUIController {
 
     private void spreadVerticesFR() {
         spreadVerticesRandomly();
-        ArrayList<Map<Circle, Pair<Double, Double>>> positions  = getSpreadVerticesFRIterationPositions();
+        ArrayList<Map<Circle, Pair<Double, Double>>> positions = getSpreadVerticesFRIterationPositions();
         if (positions.size() != 0) {
             moveCircleGroup(positions.get(positions.size() - 1));
         }
@@ -961,7 +961,7 @@ public class GUIController {
                 }
                 for (int i = 0; i < positions.size() - 1; i++) {
                     if (i % (positions.size() / 10) == 0) {
-                        moveCircleGroupSmooth(positions.get(i), 1250 / (i/10 + 1)).join();
+                        moveCircleGroupSmooth(positions.get(i), 1250 / (i / 10 + 1)).join();
                     }
                 }
                 moveCircleGroupSmooth(positions.get(positions.size() - 1), 125).join();
@@ -1020,10 +1020,10 @@ public class GUIController {
             }
         }
 
-        double xDiff = workspace.getWidth()/(layers.size() + 1);
+        double xDiff = workspace.getWidth() / (layers.size() + 1);
         double distFromLeft = xDiff;
         for (ArrayList<Vertex> arr : layers) {
-            double yDiff = workspace.getHeight()/(arr.size() + 1);
+            double yDiff = workspace.getHeight() / (arr.size() + 1);
             double distFromBottom = yDiff;
             for (Vertex v : arr) {
                 positions.put(circles.get(v), new Pair<>(distFromLeft, distFromBottom));
@@ -1077,13 +1077,15 @@ public class GUIController {
                     c.setFill(Color.RED);
                 } else if (c2 == null) {
                     c2 = c;
-                    Node l = getLine(c1, c2);
-                    Vertex v1 = getVertex(c1), v2 = getVertex(c2);
-                    Edge edge = getEdge(v1, v2);
-                    try {
-                        putEdge(edge, l);
-                    } catch (IllegalArgumentException exception) {
-                        showAlert("Wrong edge", "This edge cannot be inserted into poset.");
+                    if (c1 != c2) {
+                        Node l = getLine(c1, c2);
+                        Vertex v1 = getVertex(c1), v2 = getVertex(c2);
+                        Edge edge = getEdge(v1, v2);
+                        try {
+                            putEdge(edge, l);
+                        } catch (IllegalArgumentException exception) {
+                            showAlert("Wrong edge", "This edge cannot be inserted into poset.");
+                        }
                     }
                     c1.setFill(Color.BLACK);
                     c1.toFront();
@@ -1260,19 +1262,19 @@ public class GUIController {
         return new Edge(v1, v2);
     }
 
-    private Circle getCircle(double x, double y){
+    private Circle getCircle(double x, double y) {
         Circle c = new Circle(x, y, RADIUS);
         c.addEventHandler(MouseEvent.MOUSE_CLICKED, getCircleEventHandler(c));
-        c.setOnMousePressed((e) ->{
+        c.setOnMousePressed((e) -> {
             targetX = e.getX();
             targetY = e.getY();
         });
-        c.setOnMouseDragged((e) ->{
-            if(!removeObjectsMode&&!addVerticesMode&&!addEdgesMode){
+        c.setOnMouseDragged((e) -> {
+            if (!removeObjectsMode && !addVerticesMode && !addEdgesMode) {
                 double offsetX = e.getX() - targetX;
                 double offsetY = e.getY() - targetY;
 
-                moveCircle(c, c.getCenterX()+offsetX, c.getCenterY()+offsetY);
+                moveCircle(c, c.getCenterX() + offsetX, c.getCenterY() + offsetY);
 
                 targetX = e.getX();
                 targetY = e.getY();
@@ -1317,7 +1319,7 @@ public class GUIController {
 
     private void prepareArrays(Circle arr[], Vertex arr1[], int n) {
         for (int i = 0; i < n; i++) {
-            arr[i] = getCircle(0, i+1);
+            arr[i] = getCircle(0, i + 1);
             Vertex v = getVertex();
             arr1[i] = v;
             graph.addVertex(v);
@@ -1434,7 +1436,7 @@ public class GUIController {
         int delay;
         try {
             delay = Integer.parseInt(algorithmDelayField.getText());
-        }catch (Exception e){
+        } catch (Exception e) {
             showAlert("NaN", "Please, enter a valid number in delay field.");
             throw e;
         }
@@ -1448,8 +1450,8 @@ public class GUIController {
         switch (algorithmState) {
             case 2:
                 try {
-                resumeAlgorithm();
-                } catch (Exception e){
+                    resumeAlgorithm();
+                } catch (Exception e) {
                     return;
                 }
                 algorithmState = 1;
@@ -1463,7 +1465,7 @@ public class GUIController {
             case 0:
                 try {
                     resumeAlgorithm();
-                } catch (Exception e){
+                } catch (Exception e) {
                     return;
                 }
                 algorithmState = 1;
