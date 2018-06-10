@@ -1,0 +1,84 @@
+GraphCalc allows the user to build their own graphs and simulate certain algorithms.
+
+The graph can be built in the following ways:
+	- As soon as you run GraphCalc, you can start creating an undirected graph.
+	You can place vertices by pressing the "Add vertices" button to enter the vertex placement mode,
+	and then click anywhere on the screen to place a vertex there.
+	You can join any two vertices with an edge by selecting the "Add edges" mode. Clicking on a vertex
+	in this mode lights it up. Then you can click on any other vertex to create an edge between the lit
+	and the clicked vertex. If you wish to cancel the selection of the lit vertex, clicking it again
+	will cancel the selection.
+	- Alternatively, you can start by going into the "File" menu and selecting the "New" option. This will
+	open a new window, in which you can select the type of graph you wish to work with. Poset is a subtype of
+	a directed graph, which doesn't allow cycles (basically a DAG in this implementation). Selecting "Clear" as
+	the source will create an empty graph, on which you may work as described above.
+	- A more advanced way of creating a graph is selecting a source different from "Clear" in the "New" menu.
+	Each of those source types requires a different representation of the graph, which is supplied in a text file,
+	to which path you need to specify.
+	Let N be the vertex count of the graph you wish to create, M be the edge count, and let's assume the vertices are
+	labeled with natural numbers ranging from 1 to N. The representations are as follows:
+		- Adjacency lists require you to specify N first, and then follow it by N lines. K-th line should contain a number
+		S, which is the number of neighbours of K-th vertex, and then S numbers, the neighbours of K-th vertex.
+		Example:
+		5
+		3 2 3 5
+		2 3 4
+		1 2
+		1 3
+		0
+		- Adjacency matrix requires you to specify N first, and then follow it by N lines. Each of those lines should
+		contain N numbers, which are either 0 or 1. L-th number in K-th row should be equal to 1 if and only if there
+		is an edge from vertex K to vertex L.
+		Example:
+		5
+		0 1 1 0 1
+		0 0 1 1 0
+		0 1 0 0 0
+		0 0 1 0 0
+		0 0 0 0 0
+		- Edge list requires you to specify both N and M first, and then follow it by M lines. Each of those lines should contain
+		two numbers A and B, which symbolize the existence of an edge from vertex A to vertex B.
+		Example:
+		5 7
+		1 2
+		1 3
+		1 5
+		2 4
+		4 3
+		2 3
+		3 2
+	Each of the examples represents the same graph. Please note that the representation doesn't depend on the type of the graph,
+	yet some graphs might not be viable posets. Also the above representations don't specify the placement of the vertices on the
+	screen. That's done automatically using the "By forces" type of vertex spread, which is described later in the tutorial.
+	
+In case you are no longer fond of the graph you've created, you may enter the "Remove objects" mode by pressing the corresponding
+button. In this mode, clicking on any vertex or edge will remove it permanently.
+
+In order to pimp your graph even further, you might want to use one of the "Spread vertices" options:
+	- The "Evenly" spread places the graph's vertices on the vertices of a regular N-gon, where N is the vertex count of the graph.
+	- The "Randomly" spread places the graph's vertices randomly around the workspace.
+	- The "By forces" spread is the pretty option. It spreads the vertices randomly, and then assigns physical forces between them
+	before performing the N-body simulation. In most non-degenerate cases this results in a nicely spread graph, in which vertices
+	contained within a single connected component are close together and the connected components themselves are spread apart. Please 
+	note that since the algorithms begins with a random spread, you can try multiple times to get a result that's more keen to your eye.
+	- The "Toposort" spread simply performs a topological sort on the graph and represents it graphically by dividing the graph
+	into independent sets. In this representation, all edges point to the right. Please note that topological sort is only defined
+	on acyclic graphs and therefore does nothing on graphs containing cycles, in particular undirected graphs with any edges.
+	
+	Ticking the "Smooth" checkbox enables animations for all of the algorithms described above.
+	
+Once you are satisfied with your graph, feel free to save it. It can be done by choosing either the "Save" or "Save as..." option
+in "File" menu. When used for the first time, both open menu in which you need to specify the directory and name of the file you
+wish to save your graph to. Every further use of the "Save" option automatically saves your current graph to the last save file.
+Those saves can be loaded later using the "Open" option in the "File" menu.
+Please note that those saves are not simple text files and hold considerably more information about the graph, like its layout.
+
+In order to run premade algorithms on your graph, hover over the "Run algorithm" button and then choose the algorithm of your
+liking. Once chosen, you will be asked to select a starting vertex. You can also chicken out by pressing ESC. If you do decide
+to click on a vertex, an additional menu will show up. The "Cancel" button exits the algorithm mode entirely. Pressing
+the "Run" button starts a step-by-step animation of the algorithm. Time between the steps (in milliseconds) can be specified
+in the "Delay" textbox. Pressing the "Run" button again pauses this process. At any moment you can press the "Previous" or "Next"
+buttons to manually go to either previous or next step of the algorithm.
+Each step of the algorithm is represented by either red or blue color. In context of the implemented traversal algorithms, a
+vertex is colored red if the current iteration is "in" this vertex, therefore the movement of the red color indicates that the
+current vertex has changed. Any edge which is being considered by the algorithm as the direction of the next step is colored blue.

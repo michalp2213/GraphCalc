@@ -688,6 +688,7 @@ public class GUIController {
         return false;
     }
 
+
     /*
      ** BEGIN VERTEX SPREAD ALGORITHMS
      */
