@@ -1310,6 +1310,9 @@ public class GUIController {
         visited = null;
         algorithmMode = false;
         lines.clear();
+        c1 = null;
+        c2 = null;
+        v = null;
     }
 
     private void prepareArrays(Circle arr[], Vertex arr1[], int n) {
