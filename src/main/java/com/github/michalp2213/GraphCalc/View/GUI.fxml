@@ -140,7 +140,7 @@
                 onAction="#saveClicked"/>
 
         <Button fx:id="saveAsButton"
-                text="Save as..."
+                text="Save as"
                 maxWidth="70"
                 minWidth="70"
                 maxHeight="25"
