@@ -46,12 +46,9 @@ public class GUIController {
     public Button addVerticesButton;
     public Button addEdgesButton;
     public Button removeObjectsButton;
-    //public Button zoomInButton;
-    //public Button zoomOutButton;
     public CheckBox smoothCheckBox;
     public VBox leftSideButtons;
     public VBox graphOperationButtons;
-    //public VBox viewOptionButtons;
     public VBox fileMenu;
     public Button newButton;
     public Button openButton;

@@ -87,21 +87,6 @@
 
         <Region VBox.vgrow="ALWAYS"/>
 
-        <!-- <VBox fx:id="viewOptionButtons">
-            <Button fx:id="zoomInButton"
-                    text="Zoom in"
-                    maxWidth="70"
-                    minWidth="70"
-                    maxHeight="25"
-                    minHeight="25"/>
-
-            <Button fx:id="zoomOutButton"
-                    text="Zoom out"
-                    maxWidth="70"
-                    minWidth="70"
-                    maxHeight="25"
-                    minHeight="25"/>
-        </VBox> -->
     </VBox>
 
     <VBox fx:id="fileMenu"
